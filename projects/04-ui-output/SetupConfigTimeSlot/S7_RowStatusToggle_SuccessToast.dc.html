@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>แก้ไขข้อมูล Pool · /pool/edit · Row status toggle ปิด→เปิด + success toast (annotated) — 1920+380×1080</title>
+<style>
+:root {
+  --color-primary-500:#334d6e; --color-primary-600:#2c4463; --color-primary-50:#eef1f5;
+  --color-slate-600:#44566c; --color-slate-500:#5a6b7f; --color-slate-400:#707683;
+  --color-neutral-900:#212121; --color-neutral-500:#777777; --color-neutral-400:#9d9d9c;
+  --color-neutral-300:#dee2e6; --color-neutral-250:#dfdfdf; --color-neutral-200:#e3e3e3; --color-neutral-100:#f4f4f4;
+  --color-neutral-50:#fafafa; --color-white:#ffffff;
+  --color-success-600:#268a5c; --color-success-500:#2e9e6b; --color-success-50:#eff8f3;
+  --surface-page:var(--color-neutral-50); --surface-default:var(--color-white); --surface-raised:var(--color-white);
+  --surface-shell:var(--color-white); --surface-active:var(--color-neutral-100);
+  --text-primary:var(--color-neutral-900); --text-secondary:var(--color-slate-500); --text-tertiary:var(--color-slate-400);
+  --text-brand:var(--color-primary-500); --text-nav:#273b5b; --text-success:var(--color-success-600);
+  --border-default:var(--color-neutral-300); --border-divider:var(--color-neutral-250);
+  --action-primary-bg:var(--color-primary-500); --action-primary-text:var(--color-white);
+  --action-ghost-text:var(--color-slate-600);
+  --status-success-icon:var(--color-success-500); --status-success-bg:var(--color-success-50);
+  --font-family-base:"Prompt","Sarabun","Noto Sans Thai",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-family-mono:"JetBrains Mono","SFMono-Regular",Consolas,monospace;
+  --font-size-sm:12px; --font-size-md:13px; --font-size-xl:16px; --font-size-2xl:18px; --font-size-3xl:20px;
+  --font-weight-regular:400; --font-weight-medium:500; --font-weight-semibold:600;
+  --line-height-normal:1.55; --line-height-relaxed:1.7;
+  --space-2:4px; --space-3:6px; --space-4:8px; --space-5:12px; --space-6:16px; --space-7:20px; --space-8:24px;
+  --radius-sm:4px; --radius-full:9999px;
+  --border-width-hairline:1px; --border-width-thick:2px;
+  --shadow-shell:0 0 6px rgba(33,33,33,.06); --shadow-card:0 1px 6px rgba(33,33,33,.06); --shadow-lg:0 12px 32px rgba(33,33,33,.18);
+  --icon-size-md:18px; --icon-size-lg:20px;
+  --table-header-height:48px; --table-cell-padding-x:16px; --table-cell-padding-y:12px;
+  --layout-sidebar-width:234px; --layout-topbar-height:56px; --layout-page-padding-x:28px; --layout-page-padding-y:24px;
+  --layout-card-header-height:64px; --layout-card-padding-x:20px;
+  --nav-item-height:40px; --nav-item-padding-x:16px;
+  --z-toast:700;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--color-neutral-200);}
+body{font-family:var(--font-family-base);}
+.artboard-label{padding:var(--space-6) var(--space-8);font-size:var(--font-size-sm);color:var(--text-tertiary);font-family:var(--font-family-mono);}
+.canvas{display:flex;width:2300px;min-height:1080px;box-shadow:var(--shadow-lg);}
+.frame{width:1920px;flex-shrink:0;position:relative;display:flex;background:var(--surface-page);color:var(--text-primary);font-size:var(--font-size-md);line-height:var(--line-height-normal);}
+.sidebar{width:var(--layout-sidebar-width);flex-shrink:0;background:var(--surface-shell);box-shadow:var(--shadow-shell);display:flex;flex-direction:column;}
+.logo{height:var(--layout-topbar-height);display:flex;align-items:center;padding:0 var(--space-6);font-size:var(--font-size-xl);font-weight:var(--font-weight-semibold);color:var(--text-brand);}
+.nav{padding:var(--space-4) 0;}
+.nav-item{height:var(--nav-item-height);display:flex;align-items:center;gap:var(--space-4);padding:0 var(--nav-item-padding-x);font-size:var(--font-size-md);font-weight:var(--font-weight-medium);color:var(--text-nav);}
+.nav-item.active{background:var(--surface-active);}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{height:var(--layout-topbar-height);background:var(--surface-shell);box-shadow:var(--shadow-shell);}
+.page{flex:1;padding:var(--layout-page-padding-y) var(--layout-page-padding-x);}
+.page-title{font-size:var(--font-size-3xl);font-weight:var(--font-weight-semibold);color:var(--text-brand);}
+.breadcrumb{font-size:var(--font-size-md);color:var(--text-secondary);margin-top:var(--space-3);}
+.card{background:var(--surface-default);border-radius:var(--radius-sm);box-shadow:var(--shadow-card);margin-top:var(--space-8);}
+.card-header{height:var(--layout-card-header-height);display:flex;align-items:center;padding:0 var(--layout-card-padding-x);border-bottom:var(--border-width-hairline) solid var(--border-divider);}
+.card-header h2{font-size:var(--font-size-2xl);font-weight:var(--font-weight-semibold);color:var(--text-secondary);}
+table{width:100%;border-collapse:collapse;}
+th{height:var(--table-header-height);background:var(--surface-default);text-align:left;font-size:var(--font-size-md);font-weight:var(--font-weight-semibold);color:var(--text-primary);border-bottom:var(--border-width-hairline) solid var(--border-default);padding:0 var(--table-cell-padding-x);}
+td{padding:var(--table-cell-padding-y) var(--table-cell-padding-x);font-size:var(--font-size-md);color:var(--text-primary);border-bottom:var(--border-width-hairline) solid var(--border-default);}
+tbody tr:last-child td{border-bottom:none;}
+.status-cell{display:flex;align-items:center;gap:var(--space-4);}
+.toggle{width:36px;height:20px;border-radius:var(--radius-full);position:relative;flex-shrink:0;}
+.toggle.on{background:var(--action-primary-bg);}
+.toggle.off{background:var(--color-neutral-300);}
+.toggle .thumb{position:absolute;top:2px;width:16px;height:16px;border-radius:var(--radius-full);background:var(--surface-default);box-shadow:var(--shadow-card);}
+.toggle.on .thumb{left:18px;}
+.toggle.off .thumb{left:2px;}
+.toggle.just-activated{box-shadow:0 0 0 3px var(--color-success-100,#d3ece0);}
+.highlight-row td{background:var(--status-success-bg);}
+
+.toast{position:absolute;bottom:var(--space-8);right:var(--space-8);display:flex;align-items:center;gap:var(--space-4);background:var(--surface-raised);border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);padding:var(--space-6);border-left:var(--border-width-thick) solid var(--status-success-icon);z-index:var(--z-toast);min-width:320px;}
+.toast svg{width:var(--icon-size-md);height:var(--icon-size-md);stroke:var(--status-success-icon);flex-shrink:0;}
+.toast .msg{font-size:var(--font-size-md);color:var(--text-primary);font-weight:var(--font-weight-medium);}
+.toast .close{margin-left:auto;width:20px;height:20px;color:var(--text-tertiary);}
+.toast .close svg{width:14px;height:14px;stroke:currentColor;}
+
+.annotations{width:380px;flex-shrink:0;background:var(--surface-default);border-left:var(--border-width-hairline) solid var(--border-default);padding:var(--space-8);overflow-y:auto;}
+.annotations h3{font-size:var(--font-size-xl);font-weight:var(--font-weight-semibold);color:var(--text-brand);margin-bottom:var(--space-7);}
+.annotations .note{margin-bottom:var(--space-7);padding-bottom:var(--space-7);border-bottom:var(--border-width-hairline) solid var(--border-divider);}
+.annotations .note:last-child{border-bottom:none;}
+.annotations .note .k{font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);color:var(--text-secondary);margin-bottom:var(--space-2);}
+.annotations .note .v{font-size:var(--font-size-sm);color:var(--text-primary);line-height:var(--line-height-relaxed);}
+.annotations .flag{background:var(--status-success-bg);border-radius:var(--radius-sm);padding:var(--space-4) var(--space-5);font-size:var(--font-size-sm);color:var(--text-success);font-weight:var(--font-weight-semibold);margin-bottom:var(--space-7);}
+</style>
+</head>
+<body>
+<div class="artboard-label">S7 · แก้ไขข้อมูล Pool · /pool/edit · Row สถานะ toggled ปิด→เปิด (row 5) → success toast · [proposed] success token · 2300×1080</div>
+<div class="canvas">
+  <div class="frame">
+    <aside class="sidebar">
+      <div class="logo">Central Group Sprint</div>
+      <nav class="nav"><div class="nav-item active">ข้อมูล Pool</div></nav>
+    </aside>
+    <div class="main">
+      <div class="topbar"></div>
+      <div class="page">
+        <div class="page-title">แก้ไขข้อมูล Pool</div>
+        <div class="breadcrumb">ข้อมูล Pool › แก้ไขข้อมูล Pool</div>
+        <div class="card">
+          <div class="card-header"><h2>เวลารอบจัดส่ง — สถานะเพิ่งถูกเปิดใช้งาน (row 5)</h2></div>
+          <table>
+            <thead><tr><th>ลำดับ</th><th>ช่องทางการจัดส่ง</th><th>เวลาเริ่มต้น</th><th>เวลาสิ้นสุด</th><th>Capacity</th><th>สถานะ</th></tr></thead>
+            <tbody>
+              <tr><td>4</td><td>Delivery</td><td>13:00</td><td>15:00</td><td>150</td>
+                <td><div class="status-cell"><div class="toggle on"><div class="thumb"></div></div><span>เปิด</span></div></td></tr>
+              <tr class="highlight-row"><td>5</td><td>Delivery</td><td>15:00</td><td>17:00</td><td>90</td>
+                <td><div class="status-cell"><div class="toggle on just-activated"><div class="thumb"></div></div><span>เปิด</span></div></td></tr>
+              <tr><td>6</td><td>Delivery</td><td>09:00</td><td>10:00</td><td>30</td>
+                <td><div class="status-cell"><div class="toggle on"><div class="thumb"></div></div><span>เปิด</span></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="toast" role="status" aria-live="polite">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12l2.5 2.5L16 9"/></svg>
+      <div class="msg">เปิดใช้งานรอบจัดส่งลำดับ 5 เรียบร้อยแล้ว</div>
+      <div class="close"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+    </div>
+  </div>
+
+  <div class="annotations">
+    <h3>Annotations — S7 Status toggle + toast</h3>
+    <div class="flag">[proposed] token ที่ใช้: --color-success-* (ยังไม่ได้ verify กับ production screen จริง — DESIGN.md §0)</div>
+    <div class="note"><div class="k">Trigger</div><div class="v">คลิก toggle ในคอลัมน์ "สถานะ" ของแถวใดก็ได้ในตาราง S1 → สลับค่าทันที (optimistic, ไม่มี confirm dialog) และ summary KPI (Capacity รวม, รอบจัดส่งที่เปิดใช้งาน) คำนวณใหม่ทันทีที่การ์ด "สรุปการตั้งค่า"</div></div>
+    <div class="note"><div class="k">Toast only on ปิด → เปิด</div><div class="v">PO decision: แสดง success toast เฉพาะตอน toggle จาก "ปิด" เป็น "เปิด" (activate) เท่านั้น การ toggle "เปิด" → "ปิด" (deactivate) ไม่ต้องมี toast ใดๆ — ไม่มี toast ที่ page-level "บันทึก" เช่นกัน (ยืนยันแยกต่างหากใน S8)</div></div>
+    <div class="note"><div class="k">Toast anatomy — new component</div><div class="v">ไม่มีอยู่ใน DESIGN.md §10 (มีแค่ --z-toast token ที่กันไว้ล่วงหน้า). ออกแบบจาก token ที่มีอยู่ทั้งหมด: การ์ดขาว --surface-raised, --shadow-lg, --radius-sm, แถบสีซ้าย --status-success-icon หนา --border-width-thick — สอดคล้องปรัชญา "status เป็น icon ไม่ใช่ fill สีทึบ" ที่ใช้กับ status ทั่วทั้งระบบ. ตำแหน่ง bottom-right, auto-dismiss แนะนำ 4 วินาที, มีปุ่มปิดเอง, มี role="status" aria-live="polite" สำหรับ screen reader</div></div>
+    <div class="note"><div class="k">Visual cue on the toggle itself</div><div class="v">Toggle ที่เพิ่งเปิดมี halo สีเขียวอ่อนชั่วขณะ (--duration-normal) เป็น micro-feedback เสริม toast — เป็นการตกแต่งเชิงฟังก์ชัน ไม่ใช่ animation บน data load จึงไม่ขัดกติกา forbidden ใน CLAUDE.md §3.7</div></div>
+    <div class="note"><div class="k">Contrast check</div><div class="v">Toast text --text-primary #212121 บน --surface-raised #ffffff → 16.1:1 ✅. ไอคอน check --status-success-icon #2e9e6b บนพื้นขาว → 3.2:1 ✅ (≥3:1 สำหรับ icon/non-text) แต่สถานะยังสื่อด้วยข้อความเต็มประโยคเสมอ ไม่พึ่งไอคอนอย่างเดียว</div></div>
+  </div>
+</div>
+</body>
+</html>

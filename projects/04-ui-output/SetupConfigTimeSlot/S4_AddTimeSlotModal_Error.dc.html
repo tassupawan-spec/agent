@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>เพิ่มเวลารอบจัดส่ง · modal over /pool/edit · Error (overlap validation) — dialog study 960+340×780</title>
+<style>
+:root {
+  --color-primary-500:#334d6e; --color-primary-600:#2c4463; --color-primary-50:#eef1f5;
+  --color-slate-500:#5a6b7f; --color-slate-400:#707683;
+  --color-neutral-900:#212121; --color-neutral-500:#777777; --color-neutral-400:#9d9d9c;
+  --color-neutral-300:#dee2e6; --color-neutral-250:#dfdfdf; --color-neutral-200:#e3e3e3; --color-neutral-100:#f4f4f4;
+  --color-neutral-50:#fafafa; --color-white:#ffffff;
+  --color-danger-600:#c04a4a; --color-danger-500:#da6060; --color-danger-50:#fdf0f0;
+  --surface-page:var(--color-neutral-50); --surface-default:var(--color-white); --surface-raised:var(--color-white);
+  --surface-hover:var(--color-neutral-100); --surface-overlay:rgba(33,33,33,.40);
+  --text-primary:var(--color-neutral-900); --text-secondary:var(--color-slate-500); --text-tertiary:var(--color-slate-400);
+  --text-placeholder:var(--color-slate-400); --text-disabled:var(--color-neutral-400); --text-brand:var(--color-primary-500);
+  --text-danger:var(--color-danger-600);
+  --border-default:var(--color-neutral-300); --border-divider:var(--color-neutral-250); --border-control:var(--color-slate-400);
+  --border-focus:var(--color-primary-500); --border-danger:var(--color-danger-500);
+  --action-primary-bg:var(--color-primary-500); --action-primary-bg-hover:var(--color-primary-600);
+  --action-primary-text:var(--color-white);
+  --action-secondary-bg:var(--color-white); --action-secondary-bg-hover:var(--color-neutral-100);
+  --action-secondary-text:var(--color-primary-500); --action-secondary-border:var(--color-primary-500);
+  --focus-ring:0 0 0 2px #a8b6c8;
+  --status-danger-icon:var(--color-danger-500); --status-danger-bg:var(--color-danger-50);
+  --font-family-base:"Prompt","Sarabun","Noto Sans Thai",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-family-mono:"JetBrains Mono","SFMono-Regular",Consolas,monospace;
+  --font-size-sm:12px; --font-size-md:13px; --font-size-xl:16px;
+  --font-weight-regular:400; --font-weight-medium:500; --font-weight-semibold:600;
+  --line-height-normal:1.55; --line-height-relaxed:1.7;
+  --space-2:4px; --space-3:6px; --space-4:8px; --space-5:12px; --space-6:16px; --space-7:20px; --space-8:24px;
+  --radius-sm:4px; --radius-lg:8px;
+  --border-width-hairline:1px; --border-width-thick:2px;
+  --shadow-card:0 1px 6px rgba(33,33,33,.06); --shadow-lg:0 12px 32px rgba(33,33,33,.18);
+  --control-height-md:36px; --control-padding-x-md:var(--space-6);
+  --icon-size-md:18px;
+  --layout-dialog-width-lg:880px; --layout-form-column-gap:24px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--color-neutral-200);}
+body{font-family:var(--font-family-base);}
+.artboard-label{padding:var(--space-6) var(--space-8);font-size:var(--font-size-sm);color:var(--text-tertiary);font-family:var(--font-family-mono);}
+.canvas{display:flex;width:1300px;height:830px;box-shadow:var(--shadow-lg);}
+.stage{width:960px;flex-shrink:0;position:relative;}
+.scrim{width:100%;height:100%;background:var(--surface-overlay);display:flex;align-items:center;justify-content:center;}
+.dialog{width:var(--layout-dialog-width-lg);background:var(--surface-raised);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;}
+.dialog-header{padding:var(--space-7);border-bottom:var(--border-width-hairline) solid var(--border-divider);display:flex;align-items:center;justify-content:space-between;}
+.dialog-header h2{font-size:var(--font-size-xl);font-weight:var(--font-weight-semibold);color:var(--text-primary);}
+.dialog-close{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;border-radius:var(--radius-sm);color:var(--text-tertiary);}
+.dialog-close svg{width:var(--icon-size-md);height:var(--icon-size-md);stroke:currentColor;}
+.dialog-body{padding:var(--space-7);overflow-y:auto;max-height:560px;}
+.dialog-footer{padding:var(--space-7);border-top:var(--border-width-hairline) solid var(--border-divider);display:flex;justify-content:flex-end;gap:var(--space-4);}
+.alert-danger{display:flex;gap:var(--space-4);align-items:flex-start;background:var(--status-danger-bg);border-radius:var(--radius-sm);padding:var(--space-6);margin-bottom:var(--space-6);}
+.alert-danger svg{width:var(--icon-size-md);height:var(--icon-size-md);stroke:var(--status-danger-icon);flex-shrink:0;margin-top:2px;}
+.alert-danger .title{font-size:var(--font-size-md);font-weight:var(--font-weight-semibold);color:var(--text-danger);}
+.alert-danger .msg{font-size:var(--font-size-sm);color:var(--text-danger);margin-top:var(--space-2);line-height:var(--line-height-relaxed);}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-6) var(--layout-form-column-gap);}
+.field{display:flex;flex-direction:column;gap:var(--space-3);}
+.field label{font-size:var(--font-size-md);color:var(--text-tertiary);}
+.field label .req{color:var(--text-danger);margin-left:var(--space-2);}
+.field input,.field select{height:var(--control-height-md);border:var(--border-width-hairline) solid var(--border-control);border-radius:var(--radius-sm);padding:0 var(--space-5);font-size:var(--font-size-md);font-family:inherit;color:var(--text-primary);background:var(--surface-default);}
+.field.has-error input,.field.has-error select{border-color:var(--border-danger);border-width:var(--border-width-thick);}
+.field-error{display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-2);font-size:var(--font-size-sm);color:var(--text-danger);}
+.field-error svg{width:14px;height:14px;stroke:var(--text-danger);flex-shrink:0;}
+.time-field{position:relative;}
+.time-field svg.clock{position:absolute;right:var(--space-5);top:16px;width:var(--icon-size-md);height:var(--icon-size-md);stroke:var(--text-tertiary);pointer-events:none;}
+.check-row{display:flex;align-items:center;gap:var(--space-4);height:var(--control-height-md);}
+.btn{height:var(--control-height-md);padding:0 var(--control-padding-x-md);border-radius:var(--radius-sm);font-size:var(--font-size-md);font-weight:var(--font-weight-medium);display:inline-flex;align-items:center;gap:var(--space-2);cursor:pointer;border:none;font-family:inherit;}
+.btn-primary{background:var(--action-primary-bg);color:var(--action-primary-text);}
+.btn-secondary{background:var(--action-secondary-bg);color:var(--action-secondary-text);border:var(--border-width-hairline) solid var(--action-secondary-border);}
+
+.annotations{width:340px;flex-shrink:0;background:var(--surface-default);border-left:var(--border-width-hairline) solid var(--border-default);padding:var(--space-8);overflow-y:auto;}
+.annotations h3{font-size:var(--font-size-xl);font-weight:var(--font-weight-semibold);color:var(--text-brand);margin-bottom:var(--space-7);}
+.annotations .note{margin-bottom:var(--space-7);padding-bottom:var(--space-7);border-bottom:var(--border-width-hairline) solid var(--border-divider);}
+.annotations .note:last-child{border-bottom:none;}
+.annotations .note .k{font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);color:var(--text-secondary);margin-bottom:var(--space-2);}
+.annotations .note .v{font-size:var(--font-size-sm);color:var(--text-primary);line-height:var(--line-height-relaxed);}
+</style>
+</head>
+<body>
+<div class="artboard-label">S4 · เพิ่มเวลารอบจัดส่ง · modal over /pool/edit · Error — overlap on Slot Time &amp; Load Time · dialog study 1300×830</div>
+<div class="canvas">
+  <div class="stage">
+    <div class="scrim">
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="s4et">
+        <div class="dialog-header">
+          <h2 id="s4et">เพิ่มเวลารอบจัดส่ง</h2>
+          <button class="dialog-close" aria-label="ปิด"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </div>
+        <div class="dialog-body">
+          <div class="alert-danger" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+            <div>
+              <div class="title">ไม่สามารถบันทึกได้ — ช่วงเวลาซ้ำกับรอบที่มีอยู่</div>
+              <div class="msg">ช่วงเวลาที่กรอกทับซ้อนกับรอบจัดส่งเดิม (ลำดับ 1: 08:00–10:00) ทั้งในส่วนเวลารอบจัดส่งและเวลาโหลดรถ กรุณาแก้ไขช่วงเวลาแล้วลองใหม่</div>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label>ช่องทางการจัดส่ง <span class="req">*</span></label><select><option>Delivery</option></select></div>
+            <div class="field"><div class="check-row" style="margin-top:20px;"><input type="checkbox"><label>เป็นรอบ VIP (VIP Slot)</label></div></div>
+            <div class="field"><label>ช่องทางการขาย</label><select><option>SD - Store Delivery</option></select></div>
+            <div class="field"><label>Truck Turn <span class="req">*</span></label><select><option>1</option></select></div>
+
+            <div class="field time-field has-error">
+              <label>เวลาเริ่มต้น <span class="req">*</span></label>
+              <input type="text" value="08:00"><svg class="clock" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+              <div class="field-error"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>ทับซ้อนกับรอบลำดับ 1 (08:00–10:00)</div>
+            </div>
+            <div class="field time-field has-error">
+              <label>เวลาสิ้นสุด <span class="req">*</span></label>
+              <input type="text" value="09:30"><svg class="clock" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+              <div class="field-error"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>ทับซ้อนกับรอบลำดับ 1 (08:00–10:00)</div>
+            </div>
+
+            <div class="field"><label>Duration (จำนวนวันล่วงหน้าของ Cut off)</label><input type="text" value="1"></div>
+            <div class="field"><label>Capacity</label><input type="text" value="100"></div>
+            <div class="field time-field"><label>Cut Off Time <span class="req">*</span></label><input type="text" value="07:00"><svg class="clock" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+            <div class="field"></div>
+
+            <div class="field time-field has-error">
+              <label>เวลาโหลดเริ่มต้น <span class="req">*</span></label>
+              <input type="text" value="06:15"><svg class="clock" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+              <div class="field-error"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>ทับซ้อนกับ Load Time ของรอบลำดับ 1</div>
+            </div>
+            <div class="field time-field has-error">
+              <label>เวลาโหลดสิ้นสุด <span class="req">*</span></label>
+              <input type="text" value="06:50"><svg class="clock" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+              <div class="field-error"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>ทับซ้อนกับ Load Time ของรอบลำดับ 1</div>
+            </div>
+          </div>
+        </div>
+        <div class="dialog-footer">
+          <button class="btn btn-secondary">ปิด</button>
+          <button class="btn btn-primary">บันทึก</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations">
+    <h3>Annotations — S4 Add (Error)</h3>
+    <div class="note"><div class="k">This UI is new</div><div class="v">Prototype ไม่มี error state นี้เลย (บันทึกด้วยฟิลด์ว่างแล้วปิด modal เงียบๆ). ออกแบบใหม่ทั้งหมดตาม PO decision #2 โดยใช้ pattern ที่มีอยู่แล้วใน DESIGN.md §10 (Input error: --border-danger, error text sm/400/--text-danger) — ไม่ต้องขอ token ใหม่</div></div>
+    <div class="note"><div class="k">Two-layer error</div><div class="v">1) Alert banner บนสุดของ dialog body สรุป error ภาพรวม (ใช้ --status-danger-bg + --status-danger-icon ตาม §3.4 "rare case ที่ต้อง flag ทั้ง region") 2) Error ใต้ field แต่ละช่องที่ชนกัน (Slot Time: เวลาเริ่มต้น+เวลาสิ้นสุด, Load Time: เวลาโหลดเริ่มต้น+เวลาโหลดสิ้นสุด) — ทั้งคู่แสดงพร้อมกัน ไม่ใช่อย่างใดอย่างหนึ่ง</div></div>
+    <div class="note"><div class="k">Empty required-field case</div><div class="v">กรณีฟิลด์บังคับว่าง (ไม่ overlap) ใช้ field-error เดียวกัน ข้อความ "กรุณากรอกข้อมูล" แทน — ไม่ต้องมี alert banner บนสุด เพราะไม่ใช่ conflict กับข้อมูลอื่น</div></div>
+    <div class="note"><div class="k">Timing</div><div class="v">Validation รันตอนกด "บันทึก" (submit-time), ไม่ใช่ live ขณะพิมพ์ — ลด noise ระหว่างกรอกฟอร์ม. เมื่อแก้ field ที่ error แล้ว focus ออก (blur) ให้เคลียร์ error เฉพาะ field นั้นทันทีถ้าค่าที่แก้ไม่ทับซ้อนแล้ว</div></div>
+    <div class="note"><div class="k">Focus on error</div><div class="v">กด "บันทึก" ไม่ผ่าน → focus เด้งไปที่ field error ตัวแรก (เวลาเริ่มต้น) และ alert banner ต้องถูกประกาศด้วย role="alert" สำหรับ screen reader</div></div>
+    <div class="note"><div class="k">Contrast check</div><div class="v">Error text --text-danger #c04a4a บน --surface-raised #ffffff → 4.7:1 ✅ (≥4.5:1). Alert banner text เดียวกันบน --status-danger-bg #fdf0f0 → 4.6:1 ✅. Field border --border-danger #da6060 บนพื้นขาว → 2.7:1 — ใช้เป็น border indicator เท่านั้น (≥3:1 ไม่ผ่านเป๊ะ) จึงคู่กับ error text + icon เสมอ ไม่พึ่งสีเส้นขอบอย่างเดียว</div></div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>ยืนยันการเปลี่ยนแปลงข้อมูล · dialog over /pool/edit · Default — dialog study 960+340×600</title>
+<style>
+:root {
+  --color-primary-500:#334d6e; --color-primary-600:#2c4463;
+  --color-slate-500:#5a6b7f; --color-slate-400:#707683;
+  --color-neutral-900:#212121; --color-neutral-300:#dee2e6; --color-neutral-250:#dfdfdf; --color-neutral-200:#e3e3e3;
+  --color-neutral-100:#f4f4f4; --color-neutral-50:#fafafa; --color-white:#ffffff;
+  --color-warning-600:#d98f16; --color-warning-500:#ffb946; --color-warning-50:#fff8ec;
+  --surface-page:var(--color-neutral-50); --surface-raised:var(--color-white);
+  --text-primary:var(--color-neutral-900); --text-secondary:var(--color-slate-500); --text-tertiary:var(--color-slate-400);
+  --text-brand:var(--color-primary-500); --text-warning:var(--color-warning-600);
+  --border-divider:var(--color-neutral-250);
+  --action-primary-bg:var(--color-primary-500); --action-primary-bg-hover:var(--color-primary-600); --action-primary-text:var(--color-white);
+  --action-secondary-bg:var(--color-white); --action-secondary-text:var(--color-primary-500); --action-secondary-border:var(--color-primary-500);
+  --status-warning-icon:var(--color-warning-500); --status-warning-bg:var(--color-warning-50);
+  --font-family-base:"Prompt","Sarabun","Noto Sans Thai",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-family-mono:"JetBrains Mono","SFMono-Regular",Consolas,monospace;
+  --font-size-sm:12px; --font-size-md:13px; --font-size-xl:16px;
+  --font-weight-regular:400; --font-weight-medium:500; --font-weight-semibold:600;
+  --line-height-relaxed:1.7;
+  --space-2:4px; --space-4:8px; --space-5:12px; --space-6:16px; --space-7:20px; --space-8:24px;
+  --radius-sm:4px; --radius-lg:8px; --radius-full:9999px;
+  --border-width-hairline:1px;
+  --shadow-lg:0 12px 32px rgba(33,33,33,.18);
+  --control-height-md:36px; --control-padding-x-md:16px;
+  --icon-size-xl:32px;
+  --layout-dialog-width-sm:420px;
+  --surface-overlay:rgba(33,33,33,.40);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--color-neutral-200);}
+body{font-family:var(--font-family-base);}
+.artboard-label{padding:var(--space-6) var(--space-8);font-size:var(--font-size-sm);color:var(--text-tertiary);font-family:var(--font-family-mono);}
+.canvas{display:flex;width:1300px;height:600px;box-shadow:var(--shadow-lg);}
+.stage{width:960px;flex-shrink:0;}
+.scrim{width:100%;height:100%;background:var(--surface-overlay);display:flex;align-items:center;justify-content:center;}
+.dialog{width:var(--layout-dialog-width-sm);background:var(--surface-raised);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:var(--space-8);text-align:center;}
+.dialog svg.warn{width:var(--icon-size-xl);height:var(--icon-size-xl);stroke:var(--status-warning-icon);margin:0 auto var(--space-6);display:block;}
+.dialog h2{font-size:var(--font-size-xl);font-weight:var(--font-weight-semibold);color:var(--text-primary);margin-bottom:var(--space-5);}
+.dialog p{font-size:var(--font-size-md);color:var(--text-secondary);line-height:var(--line-height-relaxed);margin-bottom:var(--space-8);}
+.dialog-actions{display:flex;justify-content:center;gap:var(--space-4);}
+.btn{height:var(--control-height-md);padding:0 var(--control-padding-x-md);border-radius:var(--radius-sm);font-size:var(--font-size-md);font-weight:var(--font-weight-medium);cursor:pointer;border:none;font-family:inherit;min-width:120px;}
+.btn-primary{background:var(--action-primary-bg);color:var(--action-primary-text);}
+.btn-secondary{background:var(--action-secondary-bg);color:var(--action-secondary-text);border:var(--border-width-hairline) solid var(--action-secondary-border);}
+
+.annotations{width:340px;flex-shrink:0;background:var(--surface-raised);border-left:var(--border-width-hairline) solid var(--color-neutral-300);padding:var(--space-8);overflow-y:auto;}
+.annotations h3{font-size:var(--font-size-xl);font-weight:var(--font-weight-semibold);color:var(--text-brand);margin-bottom:var(--space-7);}
+.annotations .note{margin-bottom:var(--space-7);padding-bottom:var(--space-7);border-bottom:var(--border-width-hairline) solid var(--border-divider);}
+.annotations .note:last-child{border-bottom:none;}
+.annotations .note .k{font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);color:var(--text-secondary);margin-bottom:var(--space-2);}
+.annotations .note .v{font-size:var(--font-size-sm);color:var(--text-primary);line-height:var(--line-height-relaxed);}
+</style>
+</head>
+<body>
+<div class="artboard-label">S8 · ยืนยันการเปลี่ยนแปลงข้อมูล · dialog over /pool/edit · triggered by page footer "บันทึก" · dialog study 1300×600</div>
+<div class="canvas">
+  <div class="stage">
+    <div class="scrim">
+      <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="s8title" aria-describedby="s8body">
+        <svg class="warn" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+        <h2 id="s8title">ยืนยันการเปลี่ยนแปลงข้อมูล</h2>
+        <p id="s8body">คุณต้องการบันทึกการเปลี่ยนแปลงค่า Pool และเวลารอบจัดส่งนี้หรือไม่?</p>
+        <div class="dialog-actions">
+          <button class="btn btn-secondary">ยกเลิก</button>
+          <button class="btn btn-primary">ยืนยันบันทึก</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations">
+    <h3>Annotations — S8 Save Confirm</h3>
+    <div class="note"><div class="k">Matches prototype 1:1</div><div class="v">ไม่มี PO decision ให้เปลี่ยนแปลงหน้านี้ — คงไอคอน warning + heading + body + ปุ่ม "ยกเลิก"/"ยืนยันบันทึก" ตามที่สังเกตในต้นแบบ ใช้ token dialog anatomy จาก DESIGN.md §10 ([proposed], ยังไม่เคย verify กับ Ref/ จริง)</div></div>
+    <div class="note"><div class="k">No toast on confirm — PO confirmed</div><div class="v">คลิก "ยืนยันบันทึก" → ปิด dialog กลับไป S1 โดยไม่มี toast ใดๆ (ต่างจาก S7 ที่มี toast เฉพาะตอน toggle สถานะ ปิด→เปิด). ค่าที่เปลี่ยนทั้งหมด (ฟอร์ม Pool + slot ที่เพิ่ม/แก้/toggle ระหว่าง session) ถูก commit ที่จุดนี้</div></div>
+    <div class="note"><div class="k">Cancel — inferred, standard pattern</div><div class="v">"ยกเลิก" → ปิด dialog กลับไป S1 โดยไม่ save (pattern มาตรฐาน, ยังไม่ re-test แยกในต้นแบบแต่ไม่มีข้อโต้แย้งจาก PO)</div></div>
+    <div class="note"><div class="k">Focus & keyboard</div><div class="v">เปิด dialog → focus ไปที่ "ยกเลิก" (ปุ่ม non-destructive เป็น default focus เพื่อป้องกันการกด Enter พลาด). Esc = เทียบเท่า "ยกเลิก". Focus trap ในกรอบ dialog, ปิดแล้ว focus กลับไปที่ปุ่ม "บันทึก" ที่ page footer</div></div>
+    <div class="note"><div class="k">Contrast check</div><div class="v">Heading --text-primary #212121 บน --surface-raised #ffffff → 16.1:1 ✅. Body --text-secondary #5a6b7f บนขาว → 5.9:1 ✅ (≥4.5:1). Warning icon --status-warning-icon #ffb946 บนขาว → 1.8:1 (known issue เดิมจาก DESIGN.md §3.5 — ใช้เป็น icon ประกอบ heading ข้อความเข้มเสมอ ไม่ใช้สื่อความหมายเดี่ยวๆ)</div></div>
+  </div>
+</div>
+</body>
+</html>

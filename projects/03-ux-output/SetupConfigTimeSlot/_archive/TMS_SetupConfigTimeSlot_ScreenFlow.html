@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Setup Config Time Slot · Screen Flow (SUPERSEDED)</title>
+<!--
+  ⚠️ SUPERSEDED (2026-09-29). Replaced by the canonical Design Package under
+  projects/03-ux-output/SetupConfigTimeSlot/ (screen-registry.json, UX-MODEL.md,
+  WCAG.md, Owner-Result.md, ScreenFlow.html, README.md). Kept for historical
+  reference only — do not use as the source of truth.
+-->
+<style>
+body.archived-notice::before {
+  content: "SUPERSEDED — see ../ScreenFlow.html for the canonical version";
+  display: block;
+  background: #c04a4a;
+  color: #fff;
+  padding: 10px 16px;
+  font-family: sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+}
+:root {
+  --color-primary-700: #273b5b;
+  --color-primary-500: #334d6e;
+  --color-primary-100: #d5dce5;
+  --color-primary-50:  #eef1f5;
+  --color-slate-600: #44566c;
+  --color-slate-500: #5a6b7f;
+  --color-slate-400: #707683;
+  --color-neutral-900: #212121;
+  --color-neutral-300: #dee2e6;
+  --color-neutral-250: #dfdfdf;
+  --color-neutral-100: #f4f4f4;
+  --color-neutral-50:  #fafafa;
+  --color-white:       #ffffff;
+  --color-warning-600: #d98f16;
+  --color-warning-500: #ffb946;
+  --color-warning-50:  #fff8ec;
+  --color-danger-600: #c04a4a;
+  --color-danger-500: #da6060;
+  --color-danger-50:  #fdf0f0;
+  --color-info-500: #3d8ec7;
+  --color-info-50:  #eff6fb;
+
+  --surface-page:      var(--color-neutral-50);
+  --surface-default:   var(--color-white);
+  --text-primary:      var(--color-neutral-900);
+  --text-secondary:    var(--color-slate-500);
+  --text-tertiary:     var(--color-slate-400);
+  --text-brand:        var(--color-primary-500);
+  --text-inverse:      var(--color-white);
+  --text-warning:      var(--color-warning-600);
+  --text-danger:       var(--color-danger-600);
+
+  --border-default:    var(--color-neutral-300);
+  --border-divider:    var(--color-neutral-250);
+
+  --font-family-base: "Prompt", "Sarabun", "Noto Sans Thai", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-size-xs:  11px;
+  --font-size-sm:  12px;
+  --font-size-md:  13px;
+  --font-size-lg:  14px;
+  --font-size-xl:  16px;
+  --font-size-2xl: 18px;
+  --font-size-3xl: 20px;
+
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  --line-height-tight:   1.35;
+  --line-height-snug:    1.45;
+  --line-height-normal:  1.55;
+
+  --space-2:  4px;
+  --space-3:  6px;
+  --space-4:  8px;
+  --space-5:  12px;
+  --space-6:  16px;
+  --space-7:  20px;
+  --space-8:  24px;
+  --space-10: 32px;
+  --space-13: 64px;
+
+  --radius-sm:   4px;
+  --radius-lg:   8px;
+  --radius-full: 9999px;
+
+  --shadow-card:  0 1px 6px rgba(33, 33, 33, 0.06);
+  --shadow-md:    0 4px 12px rgba(33, 33, 33, 0.12);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-normal);
+}
+
+/* Two-column layout: flow doc (left) + live prototype panel (right) */
+.page-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-7);
+}
+.page-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: var(--space-8);
+}
+.prototype-panel {
+  flex: 0 0 480px;
+  position: sticky;
+  top: var(--space-6);
+  margin: var(--space-8) var(--space-8) var(--space-8) 0;
+  background: var(--surface-default);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  max-height: calc(100vh - var(--space-8) * 2);
+  display: flex;
+  flex-direction: column;
+}
+.prototype-panel-header {
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--border-divider);
+}
+.prototype-panel-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-brand);
+}
+.prototype-panel-note {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  line-height: var(--line-height-snug);
+  margin-top: var(--space-2);
+}
+.prototype-panel-note strong { color: var(--text-warning); }
+.prototype-panel-actions {
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--border-divider);
+  display: flex;
+  gap: var(--space-4);
+}
+.prototype-panel-actions a {
+  font-size: var(--font-size-sm);
+  color: var(--text-brand);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+}
+.prototype-panel-actions a:hover { text-decoration: underline; }
+.prototype-frame-wrap {
+  flex: 1 1 auto;
+  min-height: 520px;
+  background: var(--color-neutral-100);
+}
+.prototype-frame-wrap iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 520px;
+  border: 0;
+  display: block;
+}
+@media (max-width: 1400px) {
+  .page-layout { flex-direction: column; }
+  .prototype-panel {
+    position: static;
+    flex: 1 1 auto;
+    width: auto;
+    margin: 0 var(--space-8) var(--space-8) var(--space-8);
+    max-height: none;
+  }
+  .prototype-frame-wrap, .prototype-frame-wrap iframe { min-height: 640px; }
+}
+
+.page-header {
+  margin-bottom: var(--space-8);
+}
+
+.page-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-brand);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.page-meta {
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
+  line-height: var(--line-height-snug);
+}
+.page-meta code {
+  background: var(--color-neutral-100);
+  padding: 1px var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+  padding: var(--space-5) var(--space-6);
+  background: var(--surface-default);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  align-items: center;
+}
+.legend-item { display: flex; align-items: center; gap: var(--space-3); }
+.legend-swatch { width: 14px; height: 14px; border-radius: var(--radius-sm); flex: 0 0 auto; }
+.legend-line { width: 24px; height: 0; border-top: 2px solid var(--color-slate-400); }
+.legend-line.dashed { border-top-style: dashed; }
+
+/* Flow canvas */
+.flow-canvas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-13);
+}
+
+.flow-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-10);
+  flex-wrap: wrap;
+}
+
+.arrow-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  padding-top: var(--space-10);
+  gap: var(--space_2);
+}
+.arrow-col .arrow-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  text-align: center;
+  max-width: 140px;
+  margin-bottom: var(--space-2);
+  line-height: var(--line-height-tight);
+}
+.arrow-col .arrow-glyph {
+  font-size: 20px;
+  color: var(--color-slate-400);
+  line-height: 1;
+}
+.arrow-glyph.dashed-note { color: var(--color-warning-600); }
+
+/* Screen card */
+.screen-card {
+  width: 300px;
+  flex: 0 0 auto;
+  background: var(--surface-default);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.screen-card.modal { border-top: 4px solid var(--color-info-500); }
+.screen-card.dialog { border-top: 4px solid var(--color-warning-500); }
+.screen-card.screen { border-top: 4px solid var(--color-primary-500); }
+.screen-card.action { border-top: 4px solid var(--color-danger-500); width: 260px; }
+
+.screen-card-header {
+  padding: var(--space-5) var(--space-6) var(--space-4);
+  border-bottom: 1px solid var(--border-divider);
+}
+.screen-id {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-tertiary);
+  letter-spacing: 0.03em;
+  margin-bottom: var(--space-2);
+}
+.screen-name-th {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  line-height: var(--line-height-snug);
+}
+.screen-name-en {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.screen-card-body {
+  padding: var(--space-5) var(--space-6) var(--space-6);
+}
+.screen-purpose {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-snug);
+  margin-bottom: var(--space-4);
+}
+
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: 3px var(--space-4);
+  border-radius: var(--radius-full);
+  line-height: var(--line-height-tight);
+}
+.badge-default { background: var(--color-primary-50); color: var(--color-primary-700); }
+.badge-empty { background: var(--color-neutral-100); color: var(--text-secondary); }
+.badge-modal { background: var(--color-info-50); color: #235c86; }
+.badge-dialog { background: var(--color-warning-50); color: var(--text-warning); }
+.badge-danger { background: var(--color-danger-50); color: var(--text-danger); }
+.badge-filter { background: var(--color-primary-50); color: var(--color-primary-700); }
+.badge-new { background: var(--color-warning-50); color: var(--text-warning); }
+.screen-card.decision { border-top: 4px dashed var(--color-slate-400); }
+
+.note-box {
+  margin-top: var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-warning-50);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  color: var(--text-warning);
+  line-height: var(--line-height-snug);
+}
+
+/* Section header for grouping rows */
+.section-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-divider);
+}
+
+/* Footer notes */
+.footnotes {
+  margin-top: var(--space-13);
+  background: var(--surface-default);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-7) var(--space-8);
+}
+.footnotes h2 {
+  font-size: var(--font-size-xl);
+  color: var(--text-brand);
+  margin: 0 0 var(--space-5) 0;
+}
+.footnotes ol {
+  margin: 0;
+  padding-left: var(--space-6);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+}
+.footnotes li { margin-bottom: var(--space-4); }
+.footnotes li:last-child { margin-bottom: 0; }
+.footnotes strong { color: var(--text-primary); }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface-page: #14181e;
+    --surface-default: #1b212a;
+    --text-primary: #f2f4f7;
+    --text-secondary: #b3bcc8;
+    --text-tertiary: #8d97a5;
+    --border-default: #333c48;
+    --border-divider: #333c48;
+    --color-neutral-100: #2a323d;
+  }
+  body { background: var(--surface-page); }
+}
+:root[data-theme="dark"] {
+  --surface-page: #14181e;
+  --surface-default: #1b212a;
+  --text-primary: #f2f4f7;
+  --text-secondary: #b3bcc8;
+  --text-tertiary: #8d97a5;
+  --border-default: #333c48;
+  --border-divider: #333c48;
+  --color-neutral-100: #2a323d;
+}
+</style>
+</head>
+<body class="archived-notice">
+
+<div class="page-layout">
+<div class="page-main">
+
+<div class="page-header">
+  <div class="page-title">Setup Config Time Slot · Screen Flow</div>
+  <div class="page-meta">
+    Source: <code>projects/01-input-from-po/prototype/Setup Config Time Slot (Standalone) - 28092026.html</code>
+    (dated 28092026 — sole reference for this flow, per PO instruction).<br>
+    Diagram reflects states directly observed by clicking through the live prototype, annotated with PO decisions from 2026-09-28 (see Markdown companion doc §5). Dashed edges = prototype behaviour rejected for the real build, or not independently re-verified.<br>
+    <strong>2026-09-28 update:</strong> added page-load routing (S0), a Create-Pool sub-flow (S2 / S2-1 / S2-2 / S2-3), and an explicit shared validation node (S9) for Add/Edit Time Slot, per PO's updated Mermaid diagram. The Create-Pool sub-flow has <strong>no prototype reference</strong> — marked <span style="color:var(--text-warning); font-weight:var(--font-weight-semibold);">NEW</span> below.
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-swatch" style="background:var(--color-primary-500)"></span> Screen (full page state)</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:var(--color-info-500)"></span> Modal</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:var(--color-warning-500)"></span> Confirmation dialog</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:var(--color-danger-500)"></span> Immediate inline action (no confirm)</div>
+    <div class="legend-item"><span class="legend-line"></span> Observed transition</div>
+    <div class="legend-item"><span class="legend-line dashed"></span> Inferred / not fully re-verified</div>
+  </div>
+</div>
+
+<div class="flow-canvas">
+
+  <!-- Row 0: Page load decision + Create Pool flow (NEW) -->
+  <div>
+    <div class="section-label">0 · Page Load Routing และสร้าง Pool ใหม่ <span class="badge badge-new" style="margin-left:6px;">NEW — no prototype reference</span></div>
+    <div class="flow-row">
+
+      <div class="screen-card decision" style="width:220px;">
+        <div class="screen-card-header">
+          <div class="screen-id">S0 · page-load-routing</div>
+          <div class="screen-name-th">Page load</div>
+          <div class="screen-name-en">D1: มีข้อมูล Pool อยู่แล้ว?</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">มี → S1 · ไม่มี → S2</div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-label">ไม่มี Pool</div>
+        <div class="arrow-glyph">→</div>
+      </div>
+
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S2 · pool-create-entry</div>
+          <div class="screen-name-th">หน้า Pool · Empty State</div>
+          <div class="screen-name-en">No Pool exists yet</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">ไม่ใช่ตารางว่างของ S1 — นี่คือยังไม่มีข้อมูล Pool เลย เป็นจุดเข้าสู่การสร้าง Pool ใหม่</div>
+          <div class="badge-row"><span class="badge badge-new">NEW</span></div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-glyph">→</div>
+      </div>
+
+      <div class="screen-card modal">
+        <div class="screen-card-header">
+          <div class="screen-id">S2-1 · pool-create-form</div>
+          <div class="screen-name-th">กรอกข้อมูล Pool ใหม่</div>
+          <div class="screen-name-en">Create Pool form</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">ชื่อ Pool ภาษาไทย/อังกฤษ, รหัส, สถานะ ฯลฯ (ฟิลด์แน่ชัดยังต้องยืนยันกับ BA)</div>
+          <div class="badge-row"><span class="badge badge-new">NEW</span></div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-label">คลิก "บันทึก"</div>
+        <div class="arrow-glyph">→</div>
+      </div>
+
+      <div class="screen-card dialog">
+        <div class="screen-card-header">
+          <div class="screen-id">S2-2 · pool-create-confirm</div>
+          <div class="screen-name-th">บันทึกข้อมูล Pool</div>
+          <div class="screen-name-en">Save Confirm Dialog</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">ยกเลิก → กลับ S2-1 · ยืนยันบันทึก → S2-3</div>
+          <div class="badge-row"><span class="badge badge-new">NEW</span></div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-label">ยืนยันบันทึก</div>
+        <div class="arrow-glyph">→</div>
+      </div>
+
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S2-3 · pool-create-success</div>
+          <div class="screen-name-th">บันทึกสำเร็จ</div>
+          <div class="screen-name-en">Pool created</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">สร้าง Pool ใหม่เรียบร้อย → ไปที่ S1 (สถานะยังไม่มี Time Slot)</div>
+          <div class="badge-row"><span class="badge badge-new">NEW</span></div>
+          <div class="note-box">รูปแบบการแสดงผล (หน้าสำเร็จเต็มหน้า vs. toast + redirect) ยังไม่ตัดสินใจ — ดู Markdown §5 ข้อ 9</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Row 1: Core screen (two table states) -->
+  <div>
+    <div class="section-label">1 · หน้าหลัก แก้ไขข้อมูล Pool (S1 — หนึ่งหน้าจอ สองสถานะตาราง)</div>
+    <div class="flow-row">
+
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S1 · pool-edit</div>
+          <div class="screen-name-th">แก้ไขข้อมูล Pool</div>
+          <div class="screen-name-en">มีข้อมูล (populated)</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">ฟอร์มข้อมูล Pool + ตารางเวลารอบจัดส่งทั้งหมดของ Pool นี้ (Normal/VIP)</div>
+          <div class="badge-row">
+            <span class="badge badge-default">Default · Entry point</span>
+            <span class="badge badge-filter">Filterable</span>
+            <span class="badge badge-default">Paginated</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-label">คลิก "ไม่มีข้อมูล (Empty State)" ⇄ คลิก "มีข้อมูล" (prototype demo toggle) — จาก S2-3 ก็ลงจุดนี้เช่นกัน</div>
+        <div class="arrow-glyph">⇄</div>
+      </div>
+
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S1 · pool-edit</div>
+          <div class="screen-name-th">แก้ไขข้อมูล Pool</div>
+          <div class="screen-name-en">ไม่มี Time Slot (empty table state)</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">หน้าจอเดียวกับ S1 ไม่ใช่หน้าแยก — ฟอร์ม Pool เหมือนเดิม แต่ยังไม่มีเวลารอบจัดส่ง — KPI ทั้งหมด = 0, ข้อความ "ยังไม่มีข้อมูลเวลารอบจัดส่งสำหรับ Pool นี้"</div>
+          <div class="badge-row">
+            <span class="badge badge-empty">Empty table state (same screen)</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Row 2: Filter -->
+  <div>
+    <div class="section-label">2 · ตัวกรอง (Filter)</div>
+    <div class="flow-row">
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S1</div>
+          <div class="screen-name-th">แก้ไขข้อมูล Pool</div>
+          <div class="screen-name-en">(reference — same screen)</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">จุดเริ่มคลิก "ตัวกรอง"</div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-label">คลิก "ตัวกรอง"</div>
+        <div class="arrow-glyph">→</div>
+      </div>
+
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S3 · filter-panel</div>
+          <div class="screen-name-th">แผงตัวกรอง (ขยายในหน้าเดิม)</div>
+          <div class="screen-name-en">Filter Panel Expanded (inline)</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">ช่องทางการขาย / Delivery Option / Slot Type + ปุ่ม "ล้าง" / "ใช้ตัวกรอง". ทดสอบจริง: Slot Type=VIP → ตาราง 9→4 แถว, badge "(1)", chip "Slot Type: VIP"</div>
+          <div class="badge-row">
+            <span class="badge badge-filter">Inline panel</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-label">คลิก "ใช้ตัวกรอง" หรือ "ล้าง"</div>
+        <div class="arrow-glyph">→</div>
+      </div>
+
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S1</div>
+          <div class="screen-name-th">แก้ไขข้อมูล Pool</div>
+          <div class="screen-name-en">(ตารางถูกกรอง / ล้างแล้ว)</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">กลับมาหน้าเดิม พร้อมผลลัพธ์ที่กรองแล้ว หรือกลับเป็นทั้งหมด</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3: Add / Edit modal -->
+  <div>
+    <div class="section-label">3 · เพิ่ม / แก้ไข เวลารอบจัดส่ง (Modal)</div>
+    <div class="flow-row">
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S1 / S2</div>
+          <div class="screen-name-th">แก้ไขข้อมูล Pool</div>
+          <div class="screen-name-en">Default หรือ Empty</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">คลิก "เพิ่มเวลารอบนัดหมาย" (ใช้ได้ทั้งสองสถานะ)</div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-label">คลิก "เพิ่มเวลารอบนัดหมาย"</div>
+        <div class="arrow-glyph">→</div>
+      </div>
+
+      <div class="screen-card modal">
+        <div class="screen-card-header">
+          <div class="screen-id">S4 · add-timeslot-modal</div>
+          <div class="screen-name-th">เพิ่มเวลารอบจัดส่ง</div>
+          <div class="screen-name-en">Add Time Slot Modal</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">ช่องทางการจัดส่ง*, Slot Type (VIP checkbox), ช่องทางการขาย, Truck Turn*, เวลาเริ่มต้น*/สิ้นสุด* (time-picker 15 นาที), Duration, Capacity, Cut Off*, เวลาโหลด*</div>
+          <div class="badge-row">
+            <span class="badge badge-modal">Modal</span>
+          </div>
+          <div class="note-box"><strong>PO decision:</strong> "บันทึก" ต้อง validate การซ้อนทับ (overlap) กับ Slot Time และ Load Time ของแถวอื่นตาม API spec — ถ้าซ้อนทับหรือฟิลด์บังคับว่าง ต้องค้างอยู่ที่ modal พร้อม error ที่มองเห็นได้ (พฤติกรรม prototype เดิม: ปิดเงียบไม่มี error ถือเป็นข้อบกพร่องที่ต้องแก้) — ดู S9</div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-label">คลิก "ปิด"<br>→ กลับ S1, ไม่เปลี่ยนแปลง</div>
+        <div class="arrow-glyph">→</div>
+      </div>
+
+      <div class="screen-card action" style="border-top-color: var(--color-slate-400);">
+        <div class="screen-card-header">
+          <div class="screen-id">S9 · timeslot-validation</div>
+          <div class="screen-name-th">Validation + Check Overlap</div>
+          <div class="screen-name-en">Shared gate for S4 &amp; S5</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">คลิก "บันทึก" จาก S4 หรือ S5 มาที่นี่ก่อนเสมอ — ตรวจ overlap ทั้ง Slot Time และ Load Time + ฟิลด์บังคับ</div>
+          <div class="badge-row"><span class="badge badge-new">NEW node — formalizes existing rule</span></div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-label">ผ่าน validation ไม่ overlap</div>
+        <div class="arrow-glyph">→</div>
+      </div>
+
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S1</div>
+          <div class="screen-name-th">แก้ไขข้อมูล Pool</div>
+          <div class="screen-name-en">(ตารางอัปเดต)</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">กลับมาหน้าเดิม — เพิ่ม/แก้ไขแถวสำเร็จ, KPI คำนวณใหม่</div>
+        </div>
+      </div>
+    </div>
+    <div class="flow-row" style="margin-top: var(--space-6);">
+      <div class="arrow-col" style="min-width:auto;">
+        <div class="arrow-glyph dashed-note">⇠</div>
+      </div>
+      <div class="note-box" style="max-width:480px;"><strong>S9 validation ไม่ผ่าน หรือ overlap:</strong> กลับไปค้างที่ modal เดิม (S4 สำหรับ Add / S5 สำหรับ Edit) พร้อม error ที่มองเห็นได้ — ไม่มี UI ต้นแบบใน prototype ให้อ้างอิง ต้องออกแบบใหม่</div>
+    </div>
+
+    <div class="flow-row" style="margin-top: var(--space-8);">
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S1</div>
+          <div class="screen-name-th">แก้ไขข้อมูล Pool</div>
+          <div class="screen-name-en">(ตาราง — แถวใดก็ได้)</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">คลิกไอคอน "แก้ไข" (ดินสอ) ที่แถวในตาราง</div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-label">คลิกไอคอน แก้ไข ในแถว</div>
+        <div class="arrow-glyph">→</div>
+      </div>
+
+      <div class="screen-card modal">
+        <div class="screen-card-header">
+          <div class="screen-id">S5 · edit-timeslot-modal</div>
+          <div class="screen-name-th">แก้ไขเวลารอบจัดส่ง</div>
+          <div class="screen-name-en">Edit Time Slot Modal</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">ฟิลด์ชุดเดียวกับ S4 แต่พรีฟิลค่าจากแถวเดิม (ยืนยันจากแถวที่ 1: Delivery / SD - Store Delivery / Truck Turn 1 / 08:00)</div>
+          <div class="badge-row">
+            <span class="badge badge-modal">Modal · Pre-filled</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-label">คลิก "ปิด" → กลับ S1<br>คลิก "บันทึก" → S9 (เกตเดียวกับ S4)</div>
+        <div class="arrow-glyph">→</div>
+      </div>
+
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S1</div>
+          <div class="screen-name-th">แก้ไขข้อมูล Pool</div>
+          <div class="screen-name-en">(แถวอัปเดตในตาราง หลังผ่าน S9)</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">กลับมาหน้าเดิม แถวที่แก้ไขแล้วอัปเดตทันที, KPI สรุปคำนวณใหม่ — ถ้า S9 ไม่ผ่าน จะค้างที่ S5 พร้อม error แทน</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 4: destructive / immediate actions -->
+  <div>
+    <div class="section-label">4 · การลบ (ปฏิเสธสำหรับหน้าจอจริง) และสลับสถานะแถว</div>
+    <div class="flow-row">
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S1</div>
+          <div class="screen-name-th">แก้ไขข้อมูล Pool</div>
+          <div class="screen-name-en">(ตาราง — แถวใดก็ได้)</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">คลิกไอคอน "ลบ" (ถังขยะ) ที่แถวในตาราง — พฤติกรรมใน prototype เท่านั้น</div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-label">คลิกไอคอน ลบ (prototype)<br>PO: ปฏิเสธสำหรับหน้าจอจริง</div>
+        <div class="arrow-glyph dashed-note">⇢</div>
+      </div>
+
+      <div class="screen-card action">
+        <div class="screen-card-header">
+          <div class="screen-id">S6 · delete-row-action</div>
+          <div class="screen-name-th">ลบแถวทันที (เฉพาะ prototype)</div>
+          <div class="screen-name-en">Row deleted immediately — prototype only</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">Prototype: ไม่มี confirmation — แถวหายทันที, ตัวนับและ KPI สรุปอัปเดตทันที (ทดสอบจริง: 880→780 capacity, 10→9 แถว)</div>
+          <div class="badge-row">
+            <span class="badge badge-danger">Rejected for real build</span>
+          </div>
+          <div class="note-box"><strong>PO decision:</strong> ห้าม hard-delete จริง เพราะกระทบข้อมูล Report ที่อ้างอิง Slot เดิม แนะนำ: เอาไอคอน "ลบ" ออกจากตาราง แล้วใช้ toggle สถานะ (S7) เพื่อ "ปิดใช้งาน" แทนการลบ — <strong>ยังต้องยืนยัน scope กับ PO/BA เพิ่มเติม</strong>: เอาไอคอนออกทั้งหมด หรือคงไว้แต่จำกัดเงื่อนไข (เช่น อนุญาตเฉพาะ Slot ที่ยังไม่มีประวัติการใช้งาน)?</div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-glyph dashed-note">⇢</div>
+      </div>
+
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S1</div>
+          <div class="screen-name-th">แก้ไขข้อมูล Pool</div>
+          <div class="screen-name-en">(real build: ไม่มีปุ่ม ลบ ในรูปแบบนี้)</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">Prototype: อยู่หน้าเดิม ตารางและ KPI แสดงผลลัพธ์ใหม่ | Real build: การ "ปิดใช้งาน" ทำผ่าน toggle สถานะแทน</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-row" style="margin-top: var(--space-8);">
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S1</div>
+          <div class="screen-name-th">แก้ไขข้อมูล Pool</div>
+          <div class="screen-name-en">(ตาราง — คอลัมน์สถานะ)</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">คลิก toggle "เปิด/ปิด" ที่คอลัมน์สถานะของแถว</div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-label">คลิก toggle สถานะ<br>(สลับทันที ไม่มี confirm)</div>
+        <div class="arrow-glyph">→</div>
+      </div>
+
+      <div class="screen-card action">
+        <div class="screen-card-header">
+          <div class="screen-id">S7 · row-status-toggle</div>
+          <div class="screen-name-th">สลับสถานะแถวทันที</div>
+          <div class="screen-name-en">Row status toggled in place</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">เปิด ⇄ ปิด ทันที ไม่มี confirmation, KPI สรุปคำนวณใหม่แบบ live</div>
+          <div class="badge-row">
+            <span class="badge badge-danger">Immediate, no confirm</span>
+          </div>
+          <div class="note-box"><strong>PO decision:</strong> เมื่อสลับ ปิด → เปิด (activate slot) ต้องแสดง <strong>success toast</strong> ยืนยันผลสำเร็จ; สลับ เปิด → ปิด ไม่ต้องมี toast</div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-glyph">→</div>
+      </div>
+
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S1</div>
+          <div class="screen-name-th">แก้ไขข้อมูล Pool</div>
+          <div class="screen-name-en">(สถานะแถวเปลี่ยนแล้ว)</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">อยู่หน้าเดิม สถานะแถวและ KPI แสดงผลลัพธ์ใหม่</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 5: Save confirm -->
+  <div>
+    <div class="section-label">5 · บันทึกข้อมูลทั้งหน้า (Page-level Save)</div>
+    <div class="flow-row">
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S1 / S2</div>
+          <div class="screen-name-th">แก้ไขข้อมูล Pool</div>
+          <div class="screen-name-en">Footer</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">คลิกปุ่ม "บันทึก" ที่ footer ของหน้า (ไม่ใช่ปุ่มใน modal)</div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-label">คลิก "บันทึก" (page footer)</div>
+        <div class="arrow-glyph">→</div>
+      </div>
+
+      <div class="screen-card dialog">
+        <div class="screen-card-header">
+          <div class="screen-id">S8 · save-confirm-dialog</div>
+          <div class="screen-name-th">ยืนยันการเปลี่ยนแปลงข้อมูล</div>
+          <div class="screen-name-en">Save Confirmation Dialog</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">"คุณต้องการบันทึกการเปลี่ยนแปลงค่า Pool และเวลารอบจัดส่งนี้หรือไม่?" ปุ่ม "ยกเลิก" / "ยืนยันบันทึก"</div>
+          <div class="badge-row">
+            <span class="badge badge-dialog">Confirm dialog</span>
+          </div>
+          <div class="note-box"><strong>PO confirmed:</strong> ไม่พบ toast/success หลังกด "ยืนยันบันทึก" เป็นพฤติกรรมที่ตั้งใจ ไม่ต้องเพิ่ม toast ที่จุดนี้ (ดูข้อยกเว้นที่ S7 — toggle สถานะเปิดใช้งาน ต้องมี toast)</div>
+        </div>
+      </div>
+
+      <div class="arrow-col">
+        <div class="arrow-label">"ยกเลิก" (สันนิษฐาน) หรือ "ยืนยันบันทึก"</div>
+        <div class="arrow-glyph dashed-note">⇢</div>
+      </div>
+
+      <div class="screen-card screen">
+        <div class="screen-card-header">
+          <div class="screen-id">S1</div>
+          <div class="screen-name-th">แก้ไขข้อมูล Pool</div>
+          <div class="screen-name-en">(กลับมาหน้าเดิม)</div>
+        </div>
+        <div class="screen-card-body">
+          <div class="screen-purpose">ปิด dialog แล้วกลับมาหน้าเดิม ไม่ว่าจะกด "ยกเลิก" หรือ "ยืนยันบันทึก"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footnotes">
+  <h2>PO Decisions (resolved 2026-09-28)</h2>
+  <ol>
+    <li><strong>Delete (ลบ) — ปฏิเสธสำหรับหน้าจอจริง.</strong> Hard-delete ที่พบใน prototype ต้องไม่ถูกนำไปใช้จริง เพราะกระทบข้อมูล Report ที่อ้างอิง Slot เดิม แนะนำใช้ toggle สถานะแทนการลบ — <strong>ยังเหลือ 1 คำถามที่ต้องยืนยัน: เอาไอคอน "ลบ" ออกทั้งหมด หรือคงไว้แบบมีเงื่อนไข?</strong> (blocker เดียวที่เหลือก่อนส่งต่อ ui-designer)</li>
+    <li><strong>Validation ใน Modal เพิ่ม/แก้ไข เวลารอบจัดส่ง — แก้ไขแล้ว.</strong> ต้อง check overlap กับ Slot Time และ Load Time ของแถวอื่นตาม API spec แล้วแสดง error ที่มองเห็นได้เมื่อซ้อนทับหรือฟิลด์บังคับว่าง</li>
+    <li><strong>Toggle "สถานะการใช้งาน" ระดับ Pool ไม่ตอบสนอง</strong> — ยืนยันแล้วว่าเป็นข้อจำกัดของ prototype เท่านั้น หน้าจอจริงต้องใช้งานได้</li>
+    <li><strong>ปุ่ม "ย้อนกลับ" ไม่มีผล</strong> — ยืนยันถูกต้องแล้ว ไม่ต้องแก้ไข (ปลายทางอยู่นอกขอบเขตไฟล์นี้)</li>
+    <li><strong>ไม่มี toast หลัง Save — ยืนยันถูกต้อง</strong> แต่เพิ่มข้อกำหนดใหม่: toggle สถานะแถว ปิด→เปิด ต้องมี success toast</li>
+    <li><strong>Filter panel — ยืนยันแล้ว:</strong> คลิก "ตัวกรอง" ซ้ำ = ปิด panel เฉยๆ, ต้องกด "ใช้ตัวกรอง" ถึงจะ apply จริง</li>
+    <li>เมนู sidebar อื่น ๆ นอกจาก "ข้อมูล Pool" เป็นเพียง stub ที่คลิกแล้วไม่มีผล — มีเพียงหน้าจอเดียวที่ทำงานได้จริงใน bundle นี้</li>
+    <li>สวิตช์ "มีข้อมูล" / "ไม่มีข้อมูล (Empty State)" เป็นเครื่องมือของผู้สร้าง prototype สำหรับสลับดูสองสถานะ ไม่ใช่ปุ่มจริงที่ผู้ใช้งานจะเห็นในระบบจริง — ไม่นำไปออกแบบเป็นปุ่มจริง</li>
+    <li>Side effect เขียน clipboard ที่พบตอนคลิก "เพิ่มเวลารอบนัดหมาย" — น่าจะเป็นโค้ด debug/dev-helper หลงเหลือใน prototype ไม่มีจุดประสงค์ทางธุรกิจ แนะนำให้ทีม engineering เอาออก ไม่ต้องนำไปสร้างซ้ำในระบบจริง</li>
+    <li><strong>(2026-09-28) เพิ่ม Create-Pool sub-flow (S2 / S2-1 / S2-2 / S2-3) — ไม่มี prototype อ้างอิง.</strong> เป็น requirement ใหม่จาก PO ทั้งหมด ต้องออกแบบจาก DESIGN.md token ล้วนๆ ยังเหลือ 2 คำถามเปิด: ฟิลด์ที่แน่ชัดของ S2-1 (รหัส Pool เป็น system-generated หรือ user กรอกเอง) และรูปแบบของ S2-3 (หน้าสำเร็จเต็มหน้า vs. toast + redirect)</li>
+    <li><strong>เพิ่ม S9 (Validation + Check Overlap)</strong> เป็น node ที่ชัดเจนสำหรับ S4/S5 — เพื่อ formalize กติกาตรวจ overlap Slot Time/Load Time เดิม ให้เห็นชัดในผังว่า "บันทึก" ของทั้งสอง modal ผ่านจุดตรวจเดียวกัน</li>
+  </ol>
+</div>
+
+</div><!-- /.page-main -->
+
+<div class="prototype-panel">
+  <div class="prototype-panel-header">
+    <div class="prototype-panel-title">Live Prototype</div>
+    <div class="prototype-panel-note">
+      Embed ของไฟล์ต้นฉบับ — คลิก/ไล่ดูได้จริง แต่ <strong>ไม่ sync state อัตโนมัติ</strong> กับการ์ดที่กำลังดู
+      ต้องคลิกในเฟรมนี้เองให้ตรงกับ Stage ที่อ่านอยู่ (เช่น กด "เพิ่มเวลารอบนัดหมาย" เพื่อเทียบกับ S4, กด "ไม่มีข้อมูล (Empty State)" เพื่อเทียบกับสถานะว่างของ S1)<br><br>
+      <strong>S2 / S2-1 / S2-2 / S2-3 (สร้าง Pool ใหม่) และ S9 (validation error) ไม่มีอยู่ใน prototype นี้</strong> — เฟรมนี้จะไม่มีอะไรให้เทียบสำหรับ Stage เหล่านั้น
+    </div>
+  </div>
+  <div class="prototype-panel-actions">
+    <a href="../../01-input-from-po/prototype/Setup%20Config%20Time%20Slot%20(Standalone)%20-%2028092026.html" target="_blank" rel="noopener">เปิดในแท็บใหม่ ↗</a>
+  </div>
+  <div class="prototype-frame-wrap">
+    <iframe src="../../01-input-from-po/prototype/Setup%20Config%20Time%20Slot%20(Standalone)%20-%2028092026.html"
+            title="Setup Config Time Slot — Live Prototype (28092026)"
+            loading="lazy"></iframe>
+  </div>
+</div>
+
+</div><!-- /.page-layout -->
+
+</body>
+</html>

@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CFW Business Flow 1 - Create Order</title>
+<style>
+  :root{
+    --navy:#2e3b55;--bg:#f4f6f9;--lane:#eef1f5;--line:#cfd6df;--ink:#1f2733;
+    --flow:#2e6fe2;--resp:#7a828c;--void:#d9772a;--dec:#fff4d6;--decb:#d9a514;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{font-family:"Segoe UI","Sarabun",Tahoma,sans-serif;margin:0;background:var(--bg);color:var(--ink);
+    display:flex;flex-direction:column;overflow:hidden;}
+  header,.toolbar,.status-flow{flex:0 0 auto;}
+  header{background:var(--navy);color:#fff;padding:16px 26px;}
+  header h1{margin:0;font-size:19px;}
+  header p{margin:4px 0 0;font-size:13px;opacity:.85;}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:16px;align-items:center;padding:10px 26px;background:#fff;border-bottom:1px solid var(--line);}
+  .legend{display:flex;flex-wrap:wrap;gap:15px;font-size:12px;}
+  .legend span{display:inline-flex;align-items:center;gap:7px;}
+  .swatch{width:28px;height:0;border-top-width:3px;border-top-style:solid;}
+  .sw-flow{border-color:var(--flow);}.sw-resp{border-color:var(--resp);border-top-style:dashed;}.sw-void{border-color:var(--void);border-top-style:dashed;}
+  .dec-key{width:14px;height:14px;background:var(--dec);border:1.5px solid var(--decb);display:inline-block;transform:rotate(45deg);}
+
+  .status-flow{display:flex;flex-wrap:wrap;gap:5px;align-items:center;padding:10px 26px;background:#fff;border-bottom:1px solid var(--line);font-size:11px;}
+  .status-pill{background:var(--navy);color:#fff;border-radius:13px;padding:4px 9px;font-weight:600;}
+  .status-flow .arrow{color:var(--navy);font-weight:700;}
+
+  .board-wrap{flex:1 1 auto;min-height:0;overflow:auto;padding:0;}
+  .board{position:relative;display:grid;grid-template-columns:150px repeat(7,minmax(176px,1fr));
+    min-width:1660px;background:#fff;}
+  .corner{background:var(--navy);position:sticky;top:0;left:0;z-index:30;}
+  .lane-head{background:var(--navy);color:#fff;font-weight:700;font-size:12.5px;padding:11px 6px;text-align:center;
+    border-left:1px solid rgba(255,255,255,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    position:sticky;top:0;z-index:25;}
+  .lane-head small{font-weight:400;opacity:.8;}
+
+  .phase{grid-column:1 / -1;color:#fff;padding:6px 14px;font-size:12.5px;font-weight:700;position:sticky;left:0;}
+  .p1{background:#3b7dd8;}.p2{background:#2f7fb0;}.p3{background:#2faa54;}
+  .pv{background:#d9772a;}.p4{background:#c0506b;}.pe{background:#b5179e;}.p5{background:#2f8f8a;}
+  .p5b{background:#1f8f6a;}.p6{background:#6a4ea3;}.p6b{background:#9a3b6a;}
+  .pqc{background:#7a5195;}.pm{background:#0f766e;}.pp{background:#1d6fb8;}
+
+  .rowlabel{background:var(--lane);font-size:10.5px;font-weight:600;color:#56606e;padding:13px 8px;border-top:1px solid var(--line);display:flex;align-items:center;position:sticky;left:0;z-index:5;}
+  .cell{border-top:1px solid var(--line);border-left:1px solid var(--line);padding:13px 8px;min-height:84px;position:relative;display:flex;align-items:center;justify-content:center;}
+
+  .node{position:relative;z-index:2;border-radius:9px;padding:8px 9px;font-size:11px;line-height:1.3;background:#fff;
+    border:2px solid var(--navy);width:100%;max-width:220px;text-align:center;box-shadow:0 2px 5px rgba(0,0,0,.08);}
+  .node .num{display:inline-block;background:var(--navy);color:#fff;border-radius:50%;width:18px;height:18px;line-height:18px;text-align:center;font-size:10px;font-weight:700;margin-bottom:3px;}
+  .node .t{font-weight:700;display:block;}
+  .node .sub{font-size:9.5px;color:#6b7480;margin-top:2px;display:block;}
+  .nL{border-color:#3b7dd8;}.nL .num{background:#3b7dd8;}
+  .nV{border-color:#d9772a;}.nV .num{background:#d9772a;}
+  .nO{border-color:#c0506b;}.nO .num{background:#c0506b;}
+  .nE{border-color:#b5179e;}.nE .num{background:#b5179e;}
+  .nF{border-color:#2f8f8a;}.nF .num{background:#2f8f8a;}
+  .nS{border-color:#1f8f6a;}.nS .num{background:#1f8f6a;}
+  .nD{border-color:#6a4ea3;}.nD .num{background:#6a4ea3;}
+  .nP{border-color:#9a3b6a;}.nP .num{background:#9a3b6a;}
+  .nM{border-color:#0f766e;}.nM .num{background:#0f766e;}
+  .nPay{border-color:#1d6fb8;}.nPay .num{background:#1d6fb8;}
+  .nu{border-color:var(--navy);}
+  .decision{background:var(--dec);border:2px dashed var(--decb);}
+  .decision .num{background:var(--decb);}
+
+  svg.links{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;}
+  .note{padding:14px 26px 50px;font-size:12px;color:#6b7480;max-width:1220px;position:sticky;left:0;}
+  .note b{color:var(--ink);}
+</style>
+</head>
+<body>
+<header>
+  <h1>CFW – Business Flow 1: Create Order → Delivered</h1>
+  <p>System Integration Diagram Phase 1 · Draft · column headers are frozen — scroll to follow the full flow</p>
+</header>
+
+<div class="toolbar">
+  <div class="legend">
+    <span><span class="swatch sw-flow"></span>Request / Main flow</span>
+    <span><span class="swatch sw-resp"></span>Response (ตอบกลับ)</span>
+    <span><span class="swatch sw-void"></span>Void Booking</span>
+    <span><span class="dec-key"></span>Decision / routing</span>
+  </div>
+</div>
+
+<div class="status-flow">
+  <b style="margin-right:6px;">Order status:</b>
+  <span class="status-pill">NEW</span><span class="arrow">›</span>
+  <span class="status-pill">Booked</span><span class="arrow">›</span>
+  <span class="status-pill">READY_TO_PICK</span><span class="arrow">›</span>
+  <span class="status-pill">PICKED</span><span class="arrow">›</span>
+  <span class="status-pill">PICK_CONFIRM</span><span class="arrow">›</span>
+  <span class="status-pill">Truck Confirm</span><span class="arrow">›</span>
+  <span class="status-pill">CONFIRM_DELIVERY</span><span class="arrow">›</span>
+  <span class="status-pill">OUT_FOR_DELIVERY</span><span class="arrow">›</span>
+  <span class="status-pill">SHIPPING</span><span class="arrow">›</span>
+  <span class="status-pill">DELIVERED</span>
+</div>
+
+<div class="board-wrap">
+<div class="board" id="board">
+  <div class="corner"></div>
+  <div class="lane-head">Customer<small>CFW App</small></div>
+  <div class="lane-head">CFW Gateway</div>
+  <div class="lane-head">SPRINT TMS</div>
+  <div class="lane-head">SPRINT CONNECT<small>SPC</small></div>
+  <div class="lane-head">ไทวัสดุ<small>STS / eTax</small></div>
+  <div class="lane-head">SPRINT WMS</div>
+  <div class="lane-head">CHG Backend / POS</div>
+
+  <!-- PHASE 1 -->
+  <div class="phase p1">Phase 1 · Master Data Lookup (CFW Gateway → SPRINT TMS direct)</div>
+  <div class="rowlabel">Start</div>
+  <div class="cell"><div class="node nL nu" id="node1"><span class="num">1</span><span class="t">Select store &amp; time slot</span><span class="sub">Customer starts ordering</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Area / Branch master</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nL" id="node2"><span class="num">2</span><span class="t">Province/District/Sub-District/<br>Division/Branch API</span><span class="sub">direct → SPRINT TMS</span></div></div>
+  <div class="cell"><div class="node nL" id="node3"><span class="num">3</span><span class="t">Return area &amp; branch master</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Branch near me</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nL" id="node4"><span class="num">4</span><span class="t">Branch near me (All Store)</span><span class="sub">direct → SPRINT TMS</span></div></div>
+  <div class="cell"><div class="node nL" id="node5"><span class="num">5</span><span class="t">Return nearby branches</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <!-- PHASE 2 -->
+  <div class="phase p2">Phase 2 · Request Time Slot (routed by SPRINT CONNECT)</div>
+  <div class="rowlabel">Request Time slot</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nL" id="node6"><span class="num">6</span><span class="t">Request Time slot (All Store)</span><span class="sub">→ SPRINT CONNECT</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nL decision" id="node7"><span class="num">7</span><span class="t">Route by branch</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Slot response</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nL" id="node8"><span class="num">8</span><span class="t">Return available time slot</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nL" id="node9"><span class="num">9</span><span class="t">Return available time slot</span></div></div>
+  <div class="cell"></div><div class="cell"></div>
+
+  <!-- PHASE 3 -->
+  <div class="phase p3">Phase 3 · Create Booking (routed by SPRINT CONNECT)</div>
+  <div class="rowlabel">Create Booking</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nL" id="node10"><span class="num">10</span><span class="t">Create Booking (Time slot)</span><span class="sub">→ SPRINT CONNECT</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nL decision" id="node11"><span class="num">11</span><span class="t">Route by bookingTimeslotCode</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Confirm Booking</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nL" id="node12"><span class="num">12</span><span class="t">Confirm Booking</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nL" id="node13"><span class="num">13</span><span class="t">Confirm Booking</span></div></div>
+  <div class="cell"></div><div class="cell"></div>
+
+  <!-- VOID -->
+  <div class="phase pv">Phase 3b · Void Booking — triggered when customer cancels payment (optional)</div>
+  <div class="rowlabel">Void Booking</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nV" id="node14"><span class="num">14</span><span class="t">Void Booking (Time slot)</span><span class="sub">→ SPRINT CONNECT</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nV decision" id="node15"><span class="num">15</span><span class="t">Route by branch (void)</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Void response</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nV" id="node16"><span class="num">16</span><span class="t">Confirm Void</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nV" id="node17"><span class="num">17</span><span class="t">Confirm Void</span></div></div>
+  <div class="cell"></div><div class="cell"></div>
+
+  <!-- PHASE 4 -->
+  <div class="phase p4">Phase 4 · Create Sale Order — Status NEW (routed by SPRINT CONNECT)</div>
+  <div class="rowlabel">Create Sale Order</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nO" id="node18"><span class="num">18</span><span class="t">Create Sale Order</span><span class="sub">Status: NEW → SPRINT CONNECT</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nO decision" id="node19"><span class="num">19</span><span class="t">Route by branch</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Receive Sale Order</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nO" id="node20"><span class="num">20</span><span class="t">Receive Sale Order</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nO" id="node21"><span class="num">21</span><span class="t">Receive Sale Order</span><span class="sub">ไทวัสดุ (legacy)</span></div></div>
+  <div class="cell"><div class="node nO" id="node22"><span class="num">22</span><span class="t">Create Sale Order in WMS</span><span class="sub">Latphrao / Wang Hin</span></div></div>
+  <div class="cell"></div>
+
+  <div class="rowlabel">Create Shipment — flow 1</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nO" id="node74"><span class="num">74</span><span class="t">Create Shipment — run optimize → import</span><span class="sub">flow 1</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Create Shipment — flow 2</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nO" id="node75"><span class="num">75</span><span class="t">Create Shipment — manual tick order</span><span class="sub">flow 2</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Created before Pick Confirm?</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nO decision" id="node41"><span class="num">41</span><span class="t">Shipment created before Pick Confirm?</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Yes → NEW_SHIPMENT</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nO" id="node42"><span class="num">42</span><span class="t">NEW_SHIPMENT (14070)<br>/ partially picked (14071)</span><span class="sub">becomes Truck Confirm on PICK_CONFIRM (→ 44)</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <!-- PHASE 4b e-Tax -->
+  <div class="phase pe">Phase 4b · Pre-paid e-Tax / Invoice (Status NEW &amp; Pre-paid)</div>
+  <div class="rowlabel">Pre-paid check</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nE decision" id="node23"><span class="num">23</span><span class="t">If Pre-paid → trigger POS</span><span class="sub">issue ticket</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">POS issue ticket</div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nE" id="node24"><span class="num">24</span><span class="t">Issue ticket → ABB or Tax Invoice</span><span class="sub">by customer "required tax invoice" flag</span></div></div>
+
+  <div class="rowlabel">eTax issue invoice</div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nE" id="node25"><span class="num">25</span><span class="t">STS eTax: pull data from POS</span><span class="sub">issue Invoice/ABB → Document URL</span></div></div>
+  <div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Distribute doc URL</div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nE" id="node26"><span class="num">26</span><span class="t">Distribute Document URL</span><span class="sub">→ TMS &amp; CFW Gateway</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Send to customer</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nE" id="node28"><span class="num">28</span><span class="t">If TaxDestination = EMAIL</span><span class="sub">CFW sends email w/ Tax Invoice/ABB</span></div></div>
+  <div class="cell"><div class="node nE" id="node27"><span class="num">27</span><span class="t">If TaxDestination = MOBILE_NO</span><span class="sub">TMS sends SMS w/ link</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Customer receives</div>
+  <div class="cell"><div class="node nE nu" id="node29"><span class="num">29</span><span class="t">Receive Tax Invoice / ABB</span><span class="sub">via SMS or Email</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <!-- PHASE 5 -->
+  <div class="phase p5">Phase 5 · Fulfillment (SPRINT WMS) &amp; status updates</div>
+  <div class="rowlabel">Wave Started → READY_TO_PICK</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nF" id="node32"><span class="num">32</span><span class="t">Status: READY_TO_PICK</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nF" id="node31"><span class="num">31</span><span class="t">Update status</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nF" id="node30"><span class="num">30</span><span class="t">Wave Started</span></div></div>
+  <div class="cell"></div>
+
+  <div class="rowlabel">Pick Started → PICKED</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nF" id="node35"><span class="num">35</span><span class="t">Status: PICKED</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nF" id="node34"><span class="num">34</span><span class="t">Update status</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nF" id="node33"><span class="num">33</span><span class="t">Pick Started</span></div></div>
+  <div class="cell"></div>
+
+  <div class="rowlabel">Pick Confirmed</div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nF" id="node36"><span class="num">36</span><span class="t">Pick Confirmed</span></div></div>
+  <div class="cell"></div>
+
+  <div class="rowlabel">Recalculation (round-trip)</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nF" id="node38"><span class="num">38</span><span class="t">Recalculation</span><span class="sub">CFW confirm → response</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nF" id="node37"><span class="num">37</span><span class="t">Recalculation</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">PICK_CONFIRM → TMS</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nF" id="node40"><span class="num">40</span><span class="t">Receive PICK_CONFIRM</span><span class="sub">stamp QTY PICK into TMS</span></div></div>
+  <div class="cell"><div class="node nF" id="node39"><span class="num">39</span><span class="t">PICK_CONFIRM</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <!-- PHASE 5b -->
+  <div class="phase p5b">Phase 5b · Truck Confirm (SPRINT TMS)</div>
+  <div class="rowlabel">Truck Confirm</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nS" id="node44"><span class="num">44</span><span class="t">Truck Confirm</span><span class="sub">NEW_SHIPMENT (42) → Truck Confirm on PICK_CONFIRM · or shipment created after Pick Confirm = Truck Confirm directly</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">CONFIRM_DELIVERY</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nS" id="node46"><span class="num">46</span><span class="t">Receive CONFIRM_DELIVERY</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nS" id="node45"><span class="num">45</span><span class="t">Status: CONFIRM_DELIVERY</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Recalculation</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nS" id="node48"><span class="num">48</span><span class="t">Recalculation</span><span class="sub">response → TMS</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nS" id="node47"><span class="num">47</span><span class="t">Recalculation</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Invoice on delivery?</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nS decision" id="node49"><span class="num">49</span><span class="t">is_invoice_on_delivery = Yes?<br>CFW trigger POS</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nS" id="node50"><span class="num">50</span><span class="t">POS issue ticket → STS eTax</span><span class="sub">follow e-Tax (24–26) → Document URL</span></div></div>
+
+  <div class="rowlabel">SPC distributes doc</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nS" id="node77"><span class="num">77</span><span class="t">CFW receives Tax Invoice/ABB</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nS" id="node76"><span class="num">76</span><span class="t">SPC distributes Document URL</span><span class="sub">→ TMS &amp; CFW</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Print documents (TMS)</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nS" id="node51"><span class="num">51</span><span class="t">TMS receives doc → Print Tax Invoice/ABB for driver</span><span class="sub">no SMS (unlike 27)</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Print DO &amp; Truck Manifest</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nS" id="node131"><span class="num">131</span><span class="t">Print Delivery Order &amp; Truck Manifest</span><span class="sub">qty from QTY PICK</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <!-- PHASE 6 -->
+  <div class="phase p6">Phase 6 · Delivery (Driver)</div>
+  <div class="rowlabel">Check-in Store</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nD" id="node52"><span class="num">52</span><span class="t">Check-in Store</span></div></div>
+  <div class="cell"><div class="node nD" id="node53"><span class="num">53</span><span class="t">Status: CHECKIN-STORE</span><span class="sub">NOT forwarded to CFW</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Driver specifies QTY LOAD</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nD" id="node54"><span class="num">54</span><span class="t">Driver specifies QTY LOAD</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Loader approval</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nD decision" id="node55"><span class="num">55</span><span class="t">Loader approves QTY LOAD?</span><span class="sub">Reject → driver re-specify</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Recalculation (on approve)</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nD" id="node57"><span class="num">57</span><span class="t">Recalculation</span><span class="sub">response → TMS</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nD" id="node56"><span class="num">56</span><span class="t">Recalculation</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Auto-print (if qty differs)</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nD" id="node58"><span class="num">58</span><span class="t">If QTY LOAD ≠ QTY PICK_CONFIRM</span><span class="sub">auto print Delivery Order + Truck Manifest (only those orders)</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Out for Delivery</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nD" id="node59"><span class="num">59</span><span class="t">Out for Delivery (driver)</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">OUT_FOR_DELIVERY</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nD" id="node61"><span class="num">61</span><span class="t">Receive OUT_FOR_DELIVERY</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nD" id="node60"><span class="num">60</span><span class="t">Status: OUT_FOR_DELIVERY</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Check-in customer home</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nD" id="node62"><span class="num">62</span><span class="t">Driver check-in at customer home</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">SHIPPING</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nD" id="node64"><span class="num">64</span><span class="t">Receive SHIPPING</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nD" id="node63"><span class="num">63</span><span class="t">Status: SHIPPING</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Close job</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nD" id="node65"><span class="num">65</span><span class="t">Driver closes job</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Recalculation (close job)</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nD" id="node67"><span class="num">67</span><span class="t">Recalculation</span><span class="sub">response → TMS</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nD" id="node66"><span class="num">66</span><span class="t">Recalculation</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <!-- PHASE 6b -->
+  <div class="phase p6b">Phase 6b · Settlement &amp; Delivered</div>
+  <div class="rowlabel">Close job outcome</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nP decision" id="node99"><span class="num">99</span><span class="t">Close job: delivery success or fail?</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Extra payment needed?</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nP decision" id="node68"><span class="num">68</span><span class="t">Extra payment needed?</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Payment flow</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nP" id="node69"><span class="num">69</span><span class="t">Payment flow (on SPRINT TMS)</span><span class="sub">driver/O2O collects → on success</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">DELIVERED</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nP" id="node70"><span class="num">70</span><span class="t">Update status DELIVERED</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">DELIVERED → CFW → POS</div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nP" id="node72"><span class="num">72</span><span class="t">Receive DELIVERED → trigger POS</span></div></div>
+  <div class="cell"></div>
+  <div class="cell"><div class="node nP" id="node71"><span class="num">71</span><span class="t">Status: DELIVERED</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">POS issue ticket</div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nP" id="node73"><span class="num">73</span><span class="t">POS issue ticket</span><span class="sub">→ e-Tax flow (24–29)</span></div></div>
+
+  <div class="rowlabel">Check-in at store</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nP" id="node100"><span class="num">100</span><span class="t">Driver check-in at store</span><span class="sub">after DELIVERED · pickup-at-store: check-in without mileage</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Undelivered items?</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nP decision" id="node101"><span class="num">101</span><span class="t">Undelivered items (fail)?</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Loader confirm return</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nP" id="node102"><span class="num">102</span><span class="t">Loader confirms receiving returned qty</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <!-- PHASE 6c · QC -->
+  <div class="phase pqc">Phase 6c · QC on SPRINT TMS (from DELIVERED)</div>
+  <div class="rowlabel">QC step</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nP" id="node78"><span class="num">78</span><span class="t">QC step on TMS</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">QC pass?</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nP decision" id="node79"><span class="num">79</span><span class="t">QC pass?</span><span class="sub">fail → re-QC</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">QC pass</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nP" id="node80"><span class="num">80</span><span class="t">QC pass</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <!-- ALT · Manual Create Order on TMS -->
+  <div class="phase pm">Alt · Manual Create Order on SPRINT TMS (Offline Channel) — order then goes to Create Shipment (74/75) → Truck Confirm directly</div>
+  <div class="rowlabel">Customer request</div>
+  <div class="cell"><div class="node nM nu" id="node81"><span class="num">81</span><span class="t">Customer Request to delivery</span><span class="sub">Offline Channel</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Enter order info</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nM" id="node82"><span class="num">82</span><span class="t">Enter sale channel, zone,<br>Delivery type, truck type</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Check rate?</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nM decision" id="node83"><span class="num">83</span><span class="t">Would like to check rate?</span></div></div>
+  <div class="cell"><div class="node nM" id="node84"><span class="num">84</span><span class="t">Enter addition info:<br>customer, extra charge</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Check time slot</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nM" id="node85"><span class="num">85</span><span class="t">Check time slot</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Accept delivery rate?</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nM decision" id="node86"><span class="num">86</span><span class="t">Accept delivery rate?</span></div></div>
+  <div class="cell"><div class="node nM" id="node98"><span class="num">98</span><span class="t">End</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Book time slot</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nM" id="node87"><span class="num">87</span><span class="t">Book time slot</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Search customer</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nM" id="node88"><span class="num">88</span><span class="t">Search customer</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">New customer?</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nM decision" id="node89"><span class="num">89</span><span class="t">New customer?</span></div></div>
+  <div class="cell"><div class="node nM" id="node90"><span class="num">90</span><span class="t">Create new customer</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Select address</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nM" id="node91"><span class="num">91</span><span class="t">Select address</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Enter POS ticket</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nM" id="node92"><span class="num">92</span><span class="t">Enter POS ticket</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Validate POS ticket</div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nM" id="node93"><span class="num">93</span><span class="t">Validate POS ticket</span></div></div>
+
+  <div class="rowlabel">Validate pass?</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nM decision" id="node94"><span class="num">94</span><span class="t">Validate pass?</span><span class="sub">N → re-enter POS ticket</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Time slot expired?</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nM decision" id="node95"><span class="num">95</span><span class="t">Time slot expired?</span><span class="sub">Y → re-book time slot</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Time slot booked</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nM" id="node96"><span class="num">96</span><span class="t">Time slot booked</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <div class="rowlabel">Planning Step</div>
+  <div class="cell"></div><div class="cell"></div>
+  <div class="cell"><div class="node nM" id="node97"><span class="num">97</span><span class="t">Planning Step</span><span class="sub">→ Create Shipment (74 / 75) → Truck Confirm directly → normal delivery</span></div></div>
+  <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+
+  <svg class="links" id="links"></svg>
+</div>
+<div class="note">
+  <b>How to read:</b> Solid blue = request / main flow · Gray dashed = response (ตอบกลับ) · Orange dashed = Void Booking · Yellow diamond = decision / routing. Column headers are frozen while you scroll.
+  <br><br>
+  <b>Shipment creation (steps 74–75):</b> right after TMS receives the Sale Order, a shipment is created via one of two flows — <b>flow 1</b> (74) run optimize → import, or <b>flow 2</b> (75) manual tick order. Both feed the check "created before Pick Confirm?" (41): if created before Pick Confirm → NEW_SHIPMENT (14070 / 14071) (42), which becomes Truck Confirm (44) on PICK_CONFIRM; if Pick Confirm already happened (created after) → Truck Confirm directly.
+  <br><br>
+  <b>Delivery (Phase 5b–6b):</b> At Truck Confirm TMS sends CONFIRM_DELIVERY (→SPC→CFW) + a Recalculation round-trip, triggers POS/e-Tax if is_invoice_on_delivery = Yes, and prints Tax Invoice/ABB for the driver. Check-in Store → CHECKIN-STORE (to SPC only). Driver enters QTY LOAD → Loader approves (reject = re-enter) → Recalculation; if QTY LOAD ≠ PICK_CONFIRM, Delivery Order + Truck Manifest auto-print. Then OUT_FOR_DELIVERY → SHIPPING → close job (Recalculation). Settlement: no extra payment → DELIVERED; otherwise payment (driver or O2O store) then DELIVERED → triggers POS / e-Tax (24–29).
+  <br><br>
+  <b>QC (Phase 6c):</b> after DELIVERED (70) TMS runs a QC step (78) → QC pass (80) or QC fail (re-QC loop). <b>Manual Create Order (Alt):</b> besides receiving the Sale Order from SPC, an order can be created manually on TMS via the Offline Channel (81–97). After Planning Step the order goes to Create Shipment (74/75) and these orders become Truck Confirm directly, then enter the normal delivery flow.
+</div>
+
+<script>
+(function(){
+  var E=[
+    // box1 fan-out via Customer lane channel
+    {a:1,b:2,s:'m',via:'L',dx:22},{a:1,b:4,s:'m',via:'L',dx:14},{a:1,b:6,s:'m',via:'L',dx:6},
+    {a:1,b:10,s:'m',via:'L',dx:-2},{a:1,b:18,s:'m',via:'L',dx:-18},
+    {a:1,b:14,s:'v',via:'L',dx:-10,l:'Payment cancelled'},
+    // master data
+    {a:2,b:3,s:'m',dy:-7},{a:4,b:5,s:'m',dy:-7},{a:3,b:2,s:'r',dy:9},{a:5,b:4,s:'r',dy:9},
+    // slot
+    {a:6,b:7,s:'m',dy:-8},{a:7,b:8,s:'c',l:'If Latphrao / Wang Hin',dx:-8},{a:7,b:9,s:'c',l:'Other branches',dx:8},
+    {a:8,b:7,s:'r',dx:16},{a:9,b:7,s:'r',dx:16},{a:7,b:6,s:'r',dy:9},
+    // booking
+    {a:10,b:11,s:'m',dy:-8},{a:11,b:12,s:'c',l:'by code',dx:-8},{a:11,b:13,s:'c',l:'by code',dx:8},
+    {a:12,b:11,s:'r',dx:16},{a:13,b:11,s:'r',dx:16},{a:11,b:10,s:'r',dy:9},
+    // void
+    {a:14,b:15,s:'v',dy:-8},{a:15,b:16,s:'v',l:'Latphrao / Wang Hin',dx:-8},{a:15,b:17,s:'v',l:'Other branches',dx:8},
+    {a:16,b:15,s:'v',dx:16},{a:17,b:15,s:'v',dx:16},{a:15,b:14,s:'v',dy:9},
+    // sale order
+    {a:18,b:19,s:'m',dy:-8},{a:19,b:20,s:'c',l:'If Latphrao / Wang Hin',dx:-10},{a:19,b:21,s:'c',l:'Other branches',dx:10},
+    {a:19,b:22,s:'c',l:'+ create in WMS',dx:0},{a:20,b:19,s:'r',dx:16},{a:21,b:19,s:'r',dx:16},{a:19,b:18,s:'r',dy:9},
+    // create shipment (TMS) after receive SO — 2 flows into the before/after Pick Confirm check
+    {a:20,b:74,s:'m'},{a:20,b:75,s:'m',via:'R'},
+    {a:74,b:41,s:'m',via:'R'},{a:75,b:41,s:'m'},
+    {a:41,b:42,s:'c',l:'Yes (before)'},
+    // e-tax
+    {a:18,b:23,s:'m',dx:-30},{a:23,b:24,s:'c',l:'If Pre-paid'},{a:24,b:25,s:'m',l:'eTax pulls data'},
+    {a:25,b:26,s:'m',l:'Document URL'},{a:26,b:27,s:'c',l:'TaxDest = MOBILE_NO',dx:6},{a:26,b:28,s:'c',l:'TaxDest = EMAIL',dx:-12},
+    {a:27,b:29,s:'m',l:'SMS link'},{a:28,b:29,s:'m',l:'Email'},
+    // fulfillment status
+    {a:22,b:30,s:'m'},{a:30,b:31,s:'m'},{a:31,b:32,s:'m',l:'READY_TO_PICK'},
+    {a:30,b:33,s:'m'},{a:33,b:34,s:'m'},{a:34,b:35,s:'m',l:'PICKED'},{a:33,b:36,s:'m'},
+    // recalculation round-trip
+    {a:36,b:37,s:'m',l:'Recalculation'},{a:37,b:38,s:'m'},{a:38,b:37,s:'r',dy:9},{a:37,b:36,s:'r',dx:16},
+    // pick confirm -> TMS
+    {a:36,b:39,s:'m',via:'R',l:'PICK_CONFIRM'},{a:39,b:40,s:'m'},
+    // truck confirm (PICK_CONFIRM -> Truck Confirm; NEW_SHIPMENT bridges textually)
+    {a:40,b:44,s:'m'},
+    {a:44,b:45,s:'m',dx:-10},{a:45,b:46,s:'m',l:'CONFIRM_DELIVERY'},
+    {a:44,b:47,s:'m',dx:0,mid:0.84,l:'TMS sends Recalculation'},{a:47,b:48,s:'m'},{a:48,b:47,s:'r',dy:9},{a:47,b:44,s:'r',dx:26,mid:0.16},
+    {a:44,b:49,s:'m',via:'R',dx:10},{a:49,b:50,s:'c',l:'Yes → e-Tax (24–26)'},
+    {a:50,b:76,s:'m',l:'Document URL → SPC'},{a:76,b:77,s:'m',l:'distribute'},{a:76,b:51,s:'m',l:'→ TMS print'},
+    {a:44,b:51,s:'m',dx:10},
+    // delivery
+    {a:51,b:131,s:'m'},{a:131,b:52,s:'m'},{a:52,b:53,s:'m',l:'CHECKIN-STORE (not to CFW)'},
+    {a:52,b:54,s:'m'},{a:54,b:55,s:'m'},{a:55,b:54,s:'r',l:'Reject',dx:22},
+    {a:55,b:56,s:'m',l:'Approve → Recalculation'},{a:56,b:57,s:'m'},{a:57,b:56,s:'r',dy:9},{a:56,b:55,s:'r',dx:16},
+    {a:55,b:58,s:'m'},{a:58,b:59,s:'m'},
+    {a:59,b:60,s:'m'},{a:60,b:61,s:'m',l:'OUT_FOR_DELIVERY'},
+    {a:59,b:62,s:'m'},{a:62,b:63,s:'m'},{a:63,b:64,s:'m',l:'SHIPPING'},
+    {a:62,b:65,s:'m'},{a:65,b:66,s:'m',l:'Recalculation'},{a:66,b:67,s:'m'},{a:67,b:66,s:'r',dy:9},{a:66,b:65,s:'r',dx:16},
+    // settlement
+    {a:65,b:99,s:'m'},{a:99,b:68,s:'m',l:'success / fail'},
+    {a:68,b:69,s:'c',l:'POD / postpaid extra'},{a:68,b:70,s:'c',l:'No extra payment'},
+    {a:69,b:70,s:'m'},
+    {a:70,b:71,s:'m'},{a:71,b:72,s:'m',l:'DELIVERED'},{a:72,b:73,s:'m',l:'trigger POS → e-Tax (24–29)'},
+    {a:70,b:100,s:'m'},
+    {a:100,b:101,s:'m'},{a:101,b:102,s:'c',l:'Yes (fail) → return'},{a:101,b:78,s:'c',via:'R',l:'No (success)'},{a:102,b:78,s:'m'},
+    // QC step (after check-in / return)
+    {a:78,b:79,s:'m'},{a:79,b:80,s:'c',l:'QC pass'},{a:79,b:78,s:'r',l:'QC fail → re-QC',dx:24},
+    // manual create order on TMS (offline channel) -> create shipment 74/75
+    {a:81,b:82,s:'m'},{a:82,b:83,s:'m'},
+    {a:83,b:84,s:'c',l:'Y',dx:8},{a:84,b:85,s:'m'},{a:83,b:85,s:'c',l:'N'},
+    {a:85,b:86,s:'m'},{a:86,b:98,s:'c',l:'N → End'},{a:86,b:87,s:'c',l:'Y'},
+    {a:87,b:88,s:'m'},{a:88,b:89,s:'m'},
+    {a:89,b:90,s:'c',l:'Y',dx:8},{a:90,b:91,s:'m'},{a:89,b:91,s:'c',l:'N'},
+    {a:91,b:92,s:'m'},{a:92,b:93,s:'m'},{a:93,b:94,s:'m'},
+    {a:94,b:92,s:'r',l:'N',dx:24},{a:94,b:95,s:'c',l:'Y'},
+    {a:95,b:87,s:'r',dx:-130,l:'Y (slot expired)'},{a:95,b:96,s:'c',l:'N'},
+    {a:96,b:97,s:'m'}
+  ];
+  var STYLE={
+    m:{color:'#2e6fe2',w:2.3,marker:'ahF',dash:'none',lc:'#9a6b00'},
+    c:{color:'#2e6fe2',w:2.3,marker:'ahF',dash:'none',lc:'#9a6b00'},
+    r:{color:'#7a828c',w:1.4,marker:'ahG',dash:'5 4',lc:'#6b7480'},
+    v:{color:'#d9772a',w:1.7,marker:'ahV',dash:'6 4',lc:'#b9560f'}
+  };
+  var board=document.getElementById('board'), svg=document.getElementById('links');
+  var NS='http://www.w3.org/2000/svg';
+
+  function center(id){
+    var el=document.getElementById('node'+id), bb=board.getBoundingClientRect(), r=el.getBoundingClientRect();
+    return {cx:r.left-bb.left+r.width/2, top:r.top-bb.top, bottom:r.top-bb.top+r.height,
+            left:r.left-bb.left, right:r.left-bb.left+r.width, midy:r.top-bb.top+r.height/2};
+  }
+  function mk(tag,attrs){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);return e;}
+
+  function drawEdge(o){
+    if(!document.getElementById('node'+o.a)||!document.getElementById('node'+o.b)) return;
+    var st=STYLE[o.s], sc=center(o.a), tc=center(o.b), mid=(o.mid!=null?o.mid:0.5),
+        dx=o.dx||0, dy=o.dy||0, d, lx, ly;
+    if(o.via==='L'){
+      var sx=sc.cx+dx;
+      d='M '+sx+' '+sc.bottom+' V '+tc.midy+' H '+(tc.left-3);
+      lx=(sx+tc.left)/2; ly=tc.midy-6;
+    } else if(o.via==='R'){
+      var bx=tc.right+12+dx, y1=sc.bottom+(tc.midy-sc.bottom)*0.35;
+      d='M '+sc.cx+' '+sc.bottom+' V '+y1+' H '+bx+' V '+tc.midy+' H '+(tc.right+3);
+      lx=bx; ly=(y1+tc.midy)/2;
+    } else if(tc.top>=sc.bottom-6){
+      var y=sc.bottom+(tc.top-sc.bottom)*mid;
+      d='M '+(sc.cx+dx)+' '+sc.bottom+' V '+y+' H '+(tc.cx+dx)+' V '+(tc.top-2);
+      lx=(sc.cx+tc.cx)/2+dx; ly=y-5;
+    } else if(tc.bottom<=sc.top+6){
+      var y2=tc.bottom+(sc.top-tc.bottom)*mid;
+      d='M '+(sc.cx+dx)+' '+sc.top+' V '+y2+' H '+(tc.cx+dx)+' V '+(tc.bottom+2);
+      lx=(sc.cx+tc.cx)/2+dx; ly=y2-5;
+    } else {
+      var yy=((sc.midy+tc.midy)/2)+dy;
+      if(tc.cx>sc.cx){d='M '+sc.right+' '+yy+' L '+(tc.left-2)+' '+yy; lx=(sc.right+tc.left)/2;}
+      else{d='M '+sc.left+' '+yy+' L '+(tc.right+2)+' '+yy; lx=(sc.left+tc.right)/2;}
+      ly=yy-6;
+    }
+    svg.appendChild(mk('path',{d:d,fill:'none',stroke:'#ffffff','stroke-width':st.w+3,
+      'stroke-dasharray':st.dash,'stroke-linejoin':'round','stroke-linecap':'round'}));
+    svg.appendChild(mk('path',{d:d,fill:'none',stroke:st.color,'stroke-width':st.w,
+      'stroke-dasharray':st.dash,'marker-end':'url(#'+st.marker+')','stroke-linejoin':'round'}));
+    if(o.l){
+      var t=mk('text',{x:lx,y:ly,'text-anchor':'middle','font-size':'9.5',
+        'font-family':'Segoe UI, Sarabun, sans-serif',fill:st.lc,stroke:'#ffffff','stroke-width':'3','paint-order':'stroke'});
+      t.textContent=o.l; svg.appendChild(t);
+    }
+  }
+
+  function draw(){
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    var w=board.scrollWidth, h=board.scrollHeight;
+    svg.setAttribute('viewBox','0 0 '+w+' '+h); svg.setAttribute('width',w); svg.setAttribute('height',h);
+    var defs=mk('defs',{});
+    defs.innerHTML=
+      '<marker id="ahF" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2e6fe2"/></marker>'+
+      '<marker id="ahG" markerWidth="8" markerHeight="8" refX="6" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#7a828c"/></marker>'+
+      '<marker id="ahV" markerWidth="8" markerHeight="8" refX="6" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#d9772a"/></marker>';
+    svg.appendChild(defs);
+    E.forEach(drawEdge);
+  }
+  function init(){draw();}
+  if(document.readyState==='complete')init(); else window.addEventListener('load',init);
+  window.addEventListener('resize',function(){setTimeout(draw,80);});
+})();
+</script>
+</body>
+</html>

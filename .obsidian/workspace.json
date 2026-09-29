@@ -1,0 +1,234 @@
+{
+  "main": {
+    "id": "726b628dc3838e5b",
+    "type": "split",
+    "children": [
+      {
+        "id": "9980d6c64782eb25",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "5a20a67f861842b1",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "projects/02-ba-output/Pool Slot Template/TMS_PoolTimeSlotVIP_Requirement 1.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "TMS_PoolTimeSlotVIP_Requirement 1"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "3e11b398f8655a20",
+    "type": "split",
+    "children": [
+      {
+        "id": "444afb3bcc192b4c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "992564a298cb0817",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "80fa639708bb12e9",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "4de40c0cf15a3e15",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 284.5
+  },
+  "right": {
+    "id": "b973758d24f27d28",
+    "type": "split",
+    "children": [
+      {
+        "id": "d065e48f4ac95b8a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "903cbb7698fbb002",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "projects/02-ba-output/Pool Slot Template/TMS_PoolTimeSlotVIP_Requirement.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "cb41bcd7fceca528",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "projects/02-ba-output/Pool Slot Template/TMS_PoolTimeSlotVIP_Requirement.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "1eec1abff69ac7c5",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "f235fc9c766c87df",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "ff86a216e1cf1e68",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "projects/02-ba-output/Pool Slot Template/TMS_PoolTimeSlotVIP_Requirement.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          },
+          {
+            "id": "6b186f8a537ad944",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          }
+        ],
+        "currentTab": 5
+      }
+    ],
+    "direction": "horizontal",
+    "width": 200
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "5a20a67f861842b1",
+  "lastOpenFiles": [
+    "projects/03-ux-output/SetupConfigTimeSlot/screen-registry.json",
+    "projects/03-ux-output/SetupConfigTimeSlot/TMS_SetupConfigTimeSlot_ScreenFlow.md",
+    "projects/03-ux-output/SetupConfigTimeSlot/_archive/TMS_SetupConfigTimeSlot_ScreenFlow.html",
+    "projects/03-ux-output/SetupConfigTimeSlot/_archive/TMS_SetupConfigTimeSlot_ScreenFlow.md",
+    "projects/03-ux-output/SetupConfigTimeSlot/_archive",
+    "DESIGN.md",
+    "DESIGN-v2.md",
+    "ui-designer.md",
+    "ux-designer.md",
+    "projects/02-ba-output/Pool Slot Template/TMS_PoolTimeSlotVIP_Requirement 1.md",
+    "projects/02-ba-output/Pool Slot Template/TMS_PoolTimeSlotVIP_TaskBreakdown.md",
+    "projects/02-ba-output/Pool Slot Template/TMS_PoolTimeSlotVIP_Requirement.md",
+    "projects/02-ba-output/Pool Slot Template/TMS_PoolTimeSlotVIP_BA_Recheck.md",
+    "projects/02-ba-output/OrderLeadtimeBacklog/RPT_OrderLeadtimeBacklog_TechRecheck.md",
+    "projects/02-ba-output/OrderLeadtimeBacklog/RPT_OrderLeadtimeBacklog_BusinessReview.md",
+    "projects/04-ui-output/SetupConfigTimeSlot/README.md",
+    "projects/03-ux-output/SetupConfigTimeSlot/TMS_SetupConfigTimeSlot_ScreenFlow.html.tmp.31552.405ce180bb65",
+    "projects/03-ux-output/SetupConfigTimeSlot/TMS_SetupConfigTimeSlot_ScreenFlow.html.tmp.31552.7c1a1ccf0df9",
+    "projects/03-ux-output/SetupConfigTimeSlot/TMS_SetupConfigTimeSlot_ScreenFlow.html.tmp.31552.1e1cdba14c82",
+    "projects/03-ux-output/SetupConfigTimeSlot/TMS_SetupConfigTimeSlot_ScreenFlow.html.tmp.31552.504921675799",
+    "projects/03-ux-output/SetupConfigTimeSlot/TMS_SetupConfigTimeSlot_ScreenFlow.md.tmp.31552.e86d66fdccb8",
+    "projects/04-ui-output/SetupConfigTimeSlot/S8_SaveConfirmDialog.dc.html",
+    "projects/04-ui-output/SetupConfigTimeSlot/S8_SaveConfirmDialog.dc.html.tmp.31552.637e64f737f0",
+    "projects/04-ui-output/SetupConfigTimeSlot/S7_RowStatusToggle_SuccessToast.dc.html",
+    "projects/02-ba-output/UtilizationSlotDeliveryPickup/RPT_UtilizationSlotDeliveryPickup_DataConsistency_Checklist.md",
+    "projects/02-ba-output/UtilizationSlotDeliveryPickup/RPT_UtilizationSlotDeliveryPickup_TechConditionReview.md",
+    "README.md",
+    "CLAUDE.md",
+    "AGENT.md",
+    "projects/02-ba-output/Pool Slot Template/TMS_PoolTimeSlotVIP_TaskBreakdown 1.md"
+  ]
+}

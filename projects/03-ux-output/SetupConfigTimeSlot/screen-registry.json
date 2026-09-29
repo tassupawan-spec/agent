@@ -1,0 +1,400 @@
+{
+  "feature": "Setup Config Time Slot",
+  "featureThai": "ตั้งค่าเวลารอบจัดส่ง (Pool)",
+  "version": "2.0.0",
+  "generatedBy": "ux-designer",
+  "date": "2026-09-29",
+  "supersedes": "_archive/TMS_SetupConfigTimeSlot_ScreenFlow.md + .html",
+  "inputMode": "Mixed (Existing Prototype + Existing Screen Flow + Existing UI/hi-fi)",
+  "note": "This is the first canonical registry for this feature. Screen IDs below are newly established (no prior machine-readable registry existed) and are now the fixed contract going forward — do not renumber in future passes.",
+
+  "sources": [
+    {
+      "id": "SRC-PROTOTYPE",
+      "type": "Existing Prototype",
+      "ref": "projects/01-input-from-po/prototype/Setup Config Time Slot (Standalone) - 28092026.html",
+      "reliability": "High",
+      "note": "Self-unpacking bundled HTML; explored via browser automation in the prior UX pass (screenshot / accessibility tree / DOM). Not re-explored in this pass; carried forward as evidence per task instruction."
+    },
+    {
+      "id": "SRC-SCREENFLOW-OLD",
+      "type": "Existing Screen Flow",
+      "ref": "_archive/TMS_SetupConfigTimeSlot_ScreenFlow.md",
+      "reliability": "High",
+      "note": "Prior UX pass, PO-reviewed 2026-09-28/29. All PO Decisions in it are treated as DECISION here, not re-litigated."
+    },
+    {
+      "id": "SRC-UI-HIFI",
+      "type": "Existing UI (hi-fi)",
+      "ref": "projects/04-ui-output/SetupConfigTimeSlot/*.dc.html + README.md",
+      "reliability": "Medium-High",
+      "note": "Covers 8 of the old doc's screens/states (old S1,S2,S3,S4,S4-error,S5,S6,S7,S8 = 9 files). Predates the new registry naming — mapped to new IDs in each screen's prototypeReference. Does NOT cover the Create-Pool sub-flow (new S2)."
+    }
+  ],
+
+  "screens": [
+    {
+      "id": "S1",
+      "name": "แก้ไขข้อมูล Pool",
+      "nameEn": "Pool Edit",
+      "type": "User-visible",
+      "purpose": "Single screen to edit one Pool's basic data plus view/manage its full list of configured delivery-appointment time slots.",
+      "entry": [
+        "From L1 (page-load routing) when a Pool record already exists",
+        "From S2.SUCCESS after a new Pool is created (lands here with zero time slots)",
+        "Return target after closing S3/S4 modals",
+        "Return target after S1.CONFIRMATION resolves"
+      ],
+      "exit": [
+        "S3 (เพิ่มเวลารอบจัดส่ง) via เพิ่มเวลารอบนัดหมาย",
+        "S4 (แก้ไขเวลารอบจัดส่ง) via row แก้ไข",
+        "S1.CONFIRMATION via page-level บันทึก",
+        "Out of scope: ย้อนกลับ → Pool List screen (not part of this feature)"
+      ],
+      "states": [
+        {
+          "id": "S1.DEFAULT",
+          "name": "มีข้อมูล (populated table)",
+          "evidence": "OBSERVED (SRC-PROTOTYPE, SRC-SCREENFLOW-OLD old-S1)",
+          "description": "Table has >=1 time-slot rows (observed: 10 rows for Pool P0230). KPI summary card shows live-computed values.",
+          "prototypeReference": "projects/04-ui-output/SetupConfigTimeSlot/S1_PoolEdit_Default.dc.html",
+          "prototypeAction": "REUSE"
+        },
+        {
+          "id": "S1.EMPTY",
+          "name": "ไม่มี Time Slot (zero rows)",
+          "evidence": "OBSERVED (SRC-PROTOTYPE demo toggle) + DECISION (also the landing state after S2.SUCCESS)",
+          "description": "Same form/layout as S1.DEFAULT; table region replaced by centered message \"ยังไม่มีข้อมูลเวลารอบจัดส่งสำหรับ Pool นี้\"; KPI tiles all 0; no filter button; เพิ่มเวลารอบนัดหมาย stays enabled.",
+          "prototypeReference": "projects/04-ui-output/SetupConfigTimeSlot/S2_PoolEdit_Empty.dc.html",
+          "prototypeAction": "REUSE",
+          "note": "Old hi-fi filename says 'S2' — that was the old numbering's screen id, not this registry's. It is state EMPTY of this registry's S1."
+        },
+        {
+          "id": "S1.FILTER_EXPANDED",
+          "name": "ตัวกรอง expanded (inline)",
+          "evidence": "OBSERVED (SRC-PROTOTYPE, SRC-SCREENFLOW-OLD old-S3)",
+          "description": "Filter panel renders inline below the toolbar, pushing the table down (not a modal). Fields: ช่องทางการขาย, Delivery Option, Slot Type. Buttons: ล้าง / ใช้ตัวกรอง. DECISION: re-clicking ตัวกรอง only collapses the panel; only ใช้ตัวกรอง applies values to the table.",
+          "prototypeReference": "projects/04-ui-output/SetupConfigTimeSlot/S3_FilterPanel_Expanded.dc.html",
+          "prototypeAction": "REUSE"
+        },
+        {
+          "id": "S1.CONFIRMATION",
+          "name": "ยืนยันการเปลี่ยนแปลงข้อมูล (page-level Save)",
+          "evidence": "OBSERVED (SRC-PROTOTYPE, SRC-SCREENFLOW-OLD old-S8) — modeled as a State/dialog of S1, not a separate Screen, per this registry's Screen-vs-Logic-Node/modal rules",
+          "description": "Triggered by footer บันทึก. Warning icon + heading + confirm body text + ยกเลิก/ยืนยันบันทึก. DECISION: no success toast after ยืนยันบันทึก (confirmed intentional).",
+          "prototypeReference": "projects/04-ui-output/SetupConfigTimeSlot/S8_SaveConfirmDialog.dc.html",
+          "prototypeAction": "REUSE"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "S1.INT-ROW-STATUS-TOGGLE",
+          "name": "แถว สถานะ (เปิด/ปิด) toggle",
+          "evidence": "OBSERVED (SRC-PROTOTYPE) + DECISION (toast requirement)",
+          "description": "Flips immediately in place, no confirmation. Summary KPIs recompute live. DECISION: toggling ปิด→เปิด (activate) shows a success toast; ปิด→เปิด needs none, no toast on ปิด.",
+          "prototypeReference": "projects/04-ui-output/SetupConfigTimeSlot/S7_RowStatusToggle_SuccessToast.dc.html",
+          "prototypeAction": "REUSE"
+        },
+        {
+          "id": "S1.INT-ROW-DELETE",
+          "name": "แถว ลบ action",
+          "evidence": "DECISION (hard-delete rejected) + DECISION REQUIRED (scope of remaining affordance)",
+          "description": "Prototype behaviour (immediate hard delete, no confirm) is REJECTED — deleting a slot breaks Report data that references it. DECISION: replace with the existing สถานะ toggle as the deactivation path. DECISION REQUIRED (DR-01): remove the ลบ icon from the table entirely, vs keep it but restrict to slots with zero historical usage.",
+          "prototypeReference": "projects/04-ui-output/SetupConfigTimeSlot/S6_RowActions_DeactivateViaToggle.dc.html",
+          "prototypeAction": "REUSE",
+          "prototypeNote": "Shows the 'remove entirely' default option. The 'restrict to zero-usage' alternative has no artboard yet — blocked on DR-01."
+        },
+        {
+          "id": "S1.INT-CLIPBOARD-DEBUG",
+          "name": "Clipboard-write side effect on เพิ่มเวลารอบนัดหมาย click",
+          "evidence": "OBSERVED (SRC-PROTOTYPE) — flagged, not modeled",
+          "description": "Not a UX concern; confirmed prototype debug leftover. Flagged for engineering to strip out; must not be replicated in the real build.",
+          "prototypeAction": "N/A"
+        }
+      ],
+      "wcagRef": ["W-S1-01", "W-S1-02", "W-S1-03", "W-S1-04", "W-S1-05"]
+    },
+    {
+      "id": "S2",
+      "name": "สร้าง Pool ใหม่",
+      "nameEn": "Create Pool",
+      "type": "User-visible",
+      "purpose": "Entry into and completion of creating a brand-new Pool record when none exists yet for this context. New requirement (2026-09-29), no prototype reference at all.",
+      "entry": ["From L1 (page-load routing) when no Pool record exists yet"],
+      "exit": ["Lands on S1.EMPTY after S2.SUCCESS"],
+      "states": [
+        {
+          "id": "S2.EMPTY",
+          "name": "ไม่มีข้อมูล Pool (entry / call-to-action)",
+          "evidence": "PROPOSED (INFERRED from SRC-SCREENFLOW-OLD old-S2, DECISION that this flow exists at all is confirmed by PO 2026-09-29; the exact CTA label/visual is PROPOSED)",
+          "description": "Page-level empty state: no Pool data to show at all (distinct from S1.EMPTY, which has a Pool but zero time slots). Single CTA leading to S2.FORM.",
+          "prototypeReference": null,
+          "prototypeAction": "NEW"
+        },
+        {
+          "id": "S2.FORM",
+          "name": "กรอกข้อมูล Pool ใหม่",
+          "evidence": "DECISION (flow exists, PO-confirmed 2026-09-29) + DECISION REQUIRED (DR-02a: exact field list)",
+          "description": "Form to enter new Pool data before first save. Known fields (by analogy to S1's ข้อมูล Pool card): ชื่อ Pool (ภาษาไทย) *, ชื่อ Pool (ภาษาอังกฤษ) *, รหัส Pool *, สถานะการใช้งาน *. DECISION REQUIRED (DR-02a): is รหัส Pool system-generated (read-only/auto) or user-entered? S1 only ever shows it read-only in an EDIT context (existing Pool P0230) — never observed in a CREATE context. Do not assume either answer.",
+          "prototypeReference": null,
+          "prototypeAction": "NEW"
+        },
+        {
+          "id": "S2.CONFIRMATION",
+          "name": "บันทึกข้อมูล Pool · Save Confirm Dialog",
+          "evidence": "DECISION (flow exists) — modeled as a State/dialog of S2, not a separate Screen, reusing the S1.CONFIRMATION dialog component anatomy",
+          "description": "Same pattern family as S1.CONFIRMATION — confirm before creating the new Pool record. ยกเลิก returns to S2.FORM unchanged; ยืนยันบันทึก proceeds to S2.SUCCESS.",
+          "prototypeReference": "projects/04-ui-output/SetupConfigTimeSlot/S8_SaveConfirmDialog.dc.html",
+          "prototypeAction": "NEW",
+          "prototypeNote": "Content (heading/body text) differs from S1's save-confirm — reuses the same dialog component anatomy/tokens, new copy only."
+        },
+        {
+          "id": "S2.SUCCESS",
+          "name": "บันทึกสำเร็จ · Pool Created",
+          "evidence": "DECISION REQUIRED (DR-02b) — existence of a success step is in PO's diagram, but its presentation is unresolved",
+          "description": "Confirms the new Pool was created. DECISION REQUIRED (DR-02b): is this a dedicated success screen/state the user must acknowledge, or a toast + immediate redirect to S1.EMPTY? Do not design final visuals until resolved — do not invent either answer.",
+          "prototypeReference": null,
+          "prototypeAction": "MISSING"
+        }
+      ],
+      "wcagRef": ["W-S2-01", "W-S2-02", "W-S2-03"]
+    },
+    {
+      "id": "S3",
+      "name": "เพิ่มเวลารอบจัดส่ง",
+      "nameEn": "Add Time Slot Modal",
+      "type": "User-visible",
+      "purpose": "Create a new time-slot row for the current Pool. Kept as its own Screen (not downgraded to a State of S1) because: 11-field form, its own validation/error state machine shared via Logic Node L2, and independently complete hi-fi coverage as a self-contained artboard — materially more complex than a simple confirm/toast overlay.",
+      "entry": ["From S1 (either DEFAULT or EMPTY state) via เพิ่มเวลารอบนัดหมาย"],
+      "exit": ["ปิด → back to S1, no change", "บันทึก → L2 (validation gate)"],
+      "states": [
+        {
+          "id": "S3.DEFAULT",
+          "name": "Default (empty form)",
+          "evidence": "OBSERVED (SRC-PROTOTYPE, SRC-SCREENFLOW-OLD old-S4)",
+          "description": "Fields: ช่องทางการจัดส่ง*, Slot Type (VIP checkbox), ช่องทางการขาย, Truck Turn*, เวลาเริ่มต้น*, เวลาสิ้นสุด*, Duration, Capacity, Cut Off Time*, เวลาโหลดเริ่มต้น*, เวลาโหลดสิ้นสุด*. Footer: ปิด / บันทึก.",
+          "prototypeReference": "projects/04-ui-output/SetupConfigTimeSlot/S4_AddTimeSlotModal_Default.dc.html",
+          "prototypeAction": "REUSE"
+        },
+        {
+          "id": "S3.ERROR",
+          "name": "Validation / overlap error",
+          "evidence": "DECISION (SRC-SCREENFLOW-OLD PO decision #2) — prototype itself showed no error UI (silently closed on empty required fields); this state is required by the confirmed validation rule, not observed",
+          "description": "Shown when L2 fails: overlap on Slot Time and/or Load Time against existing slots, or required fields empty. Inline per-field error + banner, submit blocked.",
+          "prototypeReference": "projects/04-ui-output/SetupConfigTimeSlot/S4_AddTimeSlotModal_Error.dc.html",
+          "prototypeAction": "REUSE"
+        }
+      ],
+      "wcagRef": ["W-S3-01", "W-S3-02", "W-S3-03"]
+    },
+    {
+      "id": "S4",
+      "name": "แก้ไขเวลารอบจัดส่ง",
+      "nameEn": "Edit Time Slot Modal",
+      "type": "User-visible",
+      "purpose": "Edit an existing time-slot row. Same field set/layout as S3, pre-filled. Kept as its own Screen for the same reason as S3.",
+      "entry": ["From S1 table row แก้ไข icon"],
+      "exit": ["ปิด → back to S1, no change", "บันทึก → L2 (validation gate)"],
+      "states": [
+        {
+          "id": "S4.DEFAULT",
+          "name": "Default (pre-filled)",
+          "evidence": "OBSERVED (SRC-PROTOTYPE, SRC-SCREENFLOW-OLD old-S5)",
+          "description": "Same fields as S3.DEFAULT, pre-filled with the selected row's current values.",
+          "prototypeReference": "projects/04-ui-output/SetupConfigTimeSlot/S5_EditTimeSlotModal_Default.dc.html",
+          "prototypeAction": "REUSE"
+        },
+        {
+          "id": "S4.ERROR",
+          "name": "Validation / overlap error",
+          "evidence": "INFERRED (same L2 gate as S3.ERROR, no prototype ref of its own)",
+          "description": "Same rule/anatomy as S3.ERROR, applied to the edit context.",
+          "prototypeReference": null,
+          "prototypeAction": "REUSE",
+          "prototypeNote": "No dedicated edit-error artboard exists; the S3.ERROR anatomy applies directly (same component, different pre-filled values) — OPTIONAL to produce a distinct artboard."
+        }
+      ],
+      "wcagRef": ["W-S4-01", "W-S4-02", "W-S4-03"]
+    }
+  ],
+
+  "logicNodes": [
+    {
+      "id": "L1",
+      "name": "Page Load Routing",
+      "nameThai": "มีข้อมูล Pool อยู่แล้วหรือไม่?",
+      "evidence": "DECISION (PO-confirmed 2026-09-29, per SRC-SCREENFLOW-OLD old-S0/D1)",
+      "connectsScreens": ["S1", "S2"],
+      "description": "On page load/navigation into this feature: if a Pool record already exists for this context, route to S1.DEFAULT. If none exists, route to S2.EMPTY.",
+      "openQuestion": "Not blocking: the exact entry mechanism (e.g. navigating from a Pool List's แก้ไข vs. เพิ่ม Pool ใหม่ action, or a route parameter) is not specified by any evidence. Needed by angular-implementer before wiring real navigation, out of scope for this UX pass."
+    },
+    {
+      "id": "L2",
+      "name": "Time Slot Validation + Overlap Check",
+      "evidence": "DECISION (SRC-SCREENFLOW-OLD PO decision #2, per API spec)",
+      "connectsScreens": ["S3", "S4"],
+      "description": "Shared validation gate triggered by บันทึก on S3 or S4. Validates: (1) required fields non-empty, (2) submitted time range does not overlap existing slots, checked on both Slot Time (เวลาเริ่มต้น–เวลาสิ้นสุด) and Load Time (เวลาโหลดเริ่มต้น–เวลาโหลดสิ้นสุด). Pass → row created/updated on S1, dialog closes. Fail → stays on S3/S4 respectively with a visible inline error (never a silent close, which is the rejected prototype behaviour)."
+    }
+  ],
+
+  "decisions": [
+    {
+      "id": "D-01",
+      "screen": "S1",
+      "decision": "Hard-delete of a time slot (as seen in the prototype's ลบ icon) is rejected for the real screen — it breaks Report data that references the slot. Deactivation happens via the existing สถานะ toggle instead.",
+      "type": "DECISION",
+      "confirmedBy": "PO, 2026-09-28",
+      "status": "Resolved"
+    },
+    {
+      "id": "D-02",
+      "screen": "S3, S4, L2",
+      "decision": "On บันทึก, validate the slot's time range for overlap against existing slots on both Slot Time and Load Time, and validate required fields are non-empty. Block save with a visible inline error on conflict/empty fields — never silently close.",
+      "type": "DECISION",
+      "confirmedBy": "PO, 2026-09-28 (per API spec)",
+      "status": "Resolved"
+    },
+    {
+      "id": "D-03",
+      "screen": "S1",
+      "decision": "The Pool-level สถานะการใช้งาน toggle not responding to clicks in the prototype is a prototype limitation only. The real screen's toggle must be functional.",
+      "type": "DECISION",
+      "confirmedBy": "PO, 2026-09-28",
+      "status": "Resolved"
+    },
+    {
+      "id": "D-04",
+      "screen": "S1",
+      "decision": "ย้อนกลับ having no observable effect in the standalone bundle is confirmed correct as-is; its real destination (a Pool List screen) is out of scope for this feature.",
+      "type": "DECISION",
+      "confirmedBy": "PO, 2026-09-28",
+      "status": "Resolved"
+    },
+    {
+      "id": "D-05",
+      "screen": "S1.CONFIRMATION",
+      "decision": "No toast after page-level Save is confirmed intentional — no change.",
+      "type": "DECISION",
+      "confirmedBy": "PO, 2026-09-28",
+      "status": "Resolved"
+    },
+    {
+      "id": "D-06",
+      "screen": "S1.INT-ROW-STATUS-TOGGLE",
+      "decision": "Toggling a row's สถานะ from ปิด→เปิด (activating a slot) must show a success toast. ปิด needs none.",
+      "type": "DECISION",
+      "confirmedBy": "PO, 2026-09-28",
+      "status": "Resolved"
+    },
+    {
+      "id": "D-07",
+      "screen": "S1.FILTER_EXPANDED",
+      "decision": "Clicking ตัวกรอง again only collapses the panel; it does not itself apply/change the filter. Only ใช้ตัวกรอง applies the filter values. Confirmed correct, no change.",
+      "type": "DECISION",
+      "confirmedBy": "PO, 2026-09-28",
+      "status": "Resolved"
+    },
+    {
+      "id": "D-08",
+      "screen": "S1.INT-CLIPBOARD-DEBUG",
+      "decision": "The clipboard-write side effect on เพิ่มเวลารอบนัดหมาย click is not a UX concern — flagged as a prototype debug leftover for engineering to strip out, not modeled as a real interaction.",
+      "type": "DECISION",
+      "confirmedBy": "PO, 2026-09-28",
+      "status": "Resolved"
+    },
+    {
+      "id": "D-09",
+      "screen": "L1, S1, S2",
+      "decision": "Page load branches on L1 (มีข้อมูล Pool อยู่แล้วหรือไม่): yes → S1.DEFAULT (existing Pool, populated); no → S2.EMPTY (create-new-Pool flow), which after S2.SUCCESS lands on S1.EMPTY.",
+      "type": "DECISION",
+      "confirmedBy": "PO, 2026-09-29",
+      "status": "Resolved"
+    },
+    {
+      "id": "D-10",
+      "screen": "S1",
+      "decision": "S1's populated-table rendering and zero-time-slot rendering are two States (DEFAULT, EMPTY) of the same Screen, not two separate Screens.",
+      "type": "DECISION",
+      "confirmedBy": "PO, 2026-09-28/29",
+      "status": "Resolved"
+    },
+    {
+      "id": "DR-01",
+      "screen": "S1.INT-ROW-DELETE",
+      "decision": "Should the ลบ icon be removed from the table entirely, or kept but restricted to slots with zero historical usage?",
+      "type": "DECISION REQUIRED",
+      "options": [
+        "A) Remove ลบ entirely — only แก้ไข remains in row actions (this is the working default already shown in S1_INT-ROW-DELETE's hi-fi artboard)",
+        "B) Keep ลบ but restrict it to slots with zero historical usage (needs a usage-check API and a disabled/hidden-icon rule)"
+      ],
+      "recommendation": "A — simpler, no new API dependency, consistent with existing hi-fi default",
+      "status": "Open"
+    },
+    {
+      "id": "DR-02a",
+      "screen": "S2.FORM",
+      "decision": "Is รหัส Pool system-generated (read-only/auto) or user-entered in the Create-Pool form? S1 only ever shows it read-only in an EDIT context (existing Pool P0230) — never observed in a CREATE context.",
+      "type": "DECISION REQUIRED",
+      "options": [
+        "A) System-generated — field shown read-only/placeholder on S2.FORM, assigned on save",
+        "B) User-entered — field is an editable required text input with its own validation rules (format/uniqueness) that are not yet specified either"
+      ],
+      "recommendation": "No safe default — needs BA/API-spec confirmation before S2.FORM's field-level design is finalized",
+      "status": "Open"
+    },
+    {
+      "id": "DR-02b",
+      "screen": "S2.SUCCESS",
+      "decision": "Is the create-Pool 'success' step a dedicated success screen/state the user must acknowledge, or a toast + immediate redirect to S1.EMPTY?",
+      "type": "DECISION REQUIRED",
+      "options": [
+        "A) Dedicated success state (matches PO's diagram, which models it as a distinct step) — needs its own wireframe/content",
+        "B) Toast + immediate redirect to S1.EMPTY (simpler, consistent with D-05's no-toast-on-save precedent being the exception rather than the rule for creation success)"
+      ],
+      "recommendation": "No safe default — PO's own diagram implies A, but this has not been explicitly confirmed as final; flagging rather than assuming",
+      "status": "Open"
+    }
+  ],
+
+  "wcag": [
+    { "ref": "W-S1-01", "screen": "S1 / all states", "requirement": "Full keyboard operability: every field, toggle, button, table row action and paginator control reachable via Tab in a logical order matching visual layout; Enter/Space activates buttons and toggles.", "sc": "2.1.1, 2.4.3", "evidence": "PROPOSED" },
+    { "ref": "W-S1-02", "screen": "S1.DEFAULT / table", "requirement": "Row สถานะ toggle and row action icons must have accessible names that include row context (e.g. \"เปิดใช้งาน รอบ 08:00-09:00\"), not a bare icon with no label.", "sc": "4.1.2, 1.1.1", "evidence": "PROPOSED" },
+    { "ref": "W-S1-03", "screen": "S1.EMPTY", "requirement": "Empty-state message must be announced to screen readers when the state is entered (e.g. via a live region or focus move), not rely on visual-only change.", "sc": "4.1.3", "evidence": "PROPOSED" },
+    { "ref": "W-S1-04", "screen": "S1.FILTER_EXPANDED", "requirement": "Filter toggle button must expose expanded/collapsed state (aria-expanded); applied-filter chip must be individually removable via keyboard with an accessible name announcing which filter it represents.", "sc": "4.1.2, 2.1.1", "evidence": "PROPOSED" },
+    { "ref": "W-S1-05", "screen": "S1.CONFIRMATION", "requirement": "Dialog must trap focus while open, return focus to the triggering บันทึก button on close, and be announced (role=dialog + accessible name from the heading).", "sc": "2.4.3, 4.1.2", "evidence": "PROPOSED" },
+    { "ref": "W-S2-01", "screen": "S2.EMPTY", "requirement": "CTA into the create-Pool flow must have a clear, non-generic accessible name (not just an icon).", "sc": "2.4.6, 4.1.2", "evidence": "PROPOSED" },
+    { "ref": "W-S2-02", "screen": "S2.FORM", "requirement": "All required fields carry a programmatic required indicator (aria-required / required attr), not just a visual asterisk; labels programmatically associated to inputs.", "sc": "1.3.1, 3.3.2", "evidence": "PROPOSED" },
+    { "ref": "W-S2-03", "screen": "S2.CONFIRMATION / S2.SUCCESS", "requirement": "Same dialog-focus requirements as W-S1-05. For S2.SUCCESS specifically: if implemented as a toast (pending DR-02b), it must use an assertive/polite live region so screen-reader users are notified without needing focus to move there manually.", "sc": "4.1.3, 2.4.3", "evidence": "PROPOSED — depends on DR-02b resolution" },
+    { "ref": "W-S3-01", "screen": "S3 / all states", "requirement": "Time-picker dropdowns must be fully keyboard-operable (open on Enter/Space, arrow-key navigation between time options, Esc to close) — not mouse-only scrolling as observed in the prototype.", "sc": "2.1.1", "evidence": "PROPOSED" },
+    { "ref": "W-S3-02", "screen": "S3.ERROR", "requirement": "Each invalid field's error must be programmatically associated to that field (aria-describedby) and the error banner/summary announced via a live region on submit failure; error must never be conveyed by border colour alone.", "sc": "3.3.1, 3.3.3, 1.4.1, 4.1.2", "evidence": "PROPOSED" },
+    { "ref": "W-S3-03", "screen": "S3 footer", "requirement": "บันทึก / ปิด buttons must have distinguishable accessible names beyond visual position; focus order must not skip from the last field directly past both buttons.", "sc": "2.4.3, 4.1.2", "evidence": "PROPOSED" },
+    { "ref": "W-S4-01", "screen": "S4 / all states", "requirement": "Same as W-S3-01, applied to S4's identical time-picker controls.", "sc": "2.1.1", "evidence": "PROPOSED" },
+    { "ref": "W-S4-02", "screen": "S4.ERROR", "requirement": "Same as W-S3-02.", "sc": "3.3.1, 3.3.3, 1.4.1, 4.1.2", "evidence": "PROPOSED" },
+    { "ref": "W-S4-03", "screen": "S4 modal open", "requirement": "On opening S4 pre-filled with a row's data, focus must move into the dialog (first field or heading), not remain on the triggering แก้ไข icon.", "sc": "2.4.3", "evidence": "PROPOSED" }
+  ],
+
+  "prototypeSuggestions": [
+    { "screenId": "S1", "stateId": "S1.DEFAULT", "action": "REUSE", "source": "OBSERVED", "reason": "Existing hi-fi artboard already shows this state fully per DESIGN.md tokens." },
+    { "screenId": "S1", "stateId": "S1.EMPTY", "action": "REUSE", "source": "OBSERVED", "reason": "Existing hi-fi artboard (old filename S2_PoolEdit_Empty.dc.html) covers this state; also becomes the landing state after S2.SUCCESS." },
+    { "screenId": "S1", "stateId": "S1.FILTER_EXPANDED", "action": "REUSE", "source": "OBSERVED", "reason": "Existing hi-fi artboard covers expanded + applied filter with annotations." },
+    { "screenId": "S1", "stateId": "S1.CONFIRMATION", "action": "REUSE", "source": "OBSERVED", "reason": "Existing hi-fi artboard covers the save-confirm dialog." },
+    { "screenId": "S1", "stateId": "S1.INT-ROW-STATUS-TOGGLE", "action": "REUSE", "source": "OBSERVED", "reason": "Existing hi-fi artboard covers the toggle + success toast." },
+    { "screenId": "S1", "stateId": "S1.INT-ROW-DELETE", "action": "UPDATE", "source": "DECISION REQUIRED (DR-01)", "reason": "Existing hi-fi artboard shows the 'remove entirely' default; needs revisiting only if PO picks option B (restrict to zero-usage) instead — a second artboard variant would then be NEW." },
+    { "screenId": "S2", "stateId": "S2.EMPTY", "action": "NEW", "source": "PROPOSED", "reason": "No prototype or hi-fi reference exists at all; new requirement." },
+    { "screenId": "S2", "stateId": "S2.FORM", "action": "NEW", "source": "DECISION REQUIRED (DR-02a)", "reason": "No prototype reference; field list has an open question (รหัส Pool source) that should be resolved before final hi-fi, though a first-pass design can proceed with the field flagged." },
+    { "screenId": "S2", "stateId": "S2.CONFIRMATION", "action": "NEW", "source": "PROPOSED", "reason": "New screen context; reuses the existing save-confirm dialog component anatomy/tokens with new copy." },
+    { "screenId": "S2", "stateId": "S2.SUCCESS", "action": "MISSING", "source": "DECISION REQUIRED (DR-02b)", "reason": "Cannot design until PO decides dedicated-screen vs toast+redirect — designing either now would silently pre-empt that decision." },
+    { "screenId": "S3", "stateId": "S3.DEFAULT", "action": "REUSE", "source": "OBSERVED", "reason": "Existing hi-fi artboard covers the default add-time-slot form." },
+    { "screenId": "S3", "stateId": "S3.ERROR", "action": "REUSE", "source": "DECISION (D-02)", "reason": "Existing hi-fi artboard already designed this error state per the confirmed validation rule, even though the prototype itself never showed it." },
+    { "screenId": "S4", "stateId": "S4.DEFAULT", "action": "REUSE", "source": "OBSERVED", "reason": "Existing hi-fi artboard covers the pre-filled edit form." },
+    { "screenId": "S4", "stateId": "S4.ERROR", "action": "REUSE", "source": "INFERRED", "reason": "No dedicated artboard, but identical component/anatomy to S3.ERROR (same Logic Node L2) — OPTIONAL to produce a distinct artboard for completeness." }
+  ],
+
+  "traceability": [
+    { "requirement": "PO Decision D-01 (delete → deactivate)", "journeyStep": "J1 — manage time slots", "screen": "S1", "state": "S1.INT-ROW-DELETE", "prototype": "REUSE (default option) / UPDATE if DR-01=B", "wcag": "W-S1-02" },
+    { "requirement": "PO Decision D-02 (overlap validation)", "journeyStep": "J1 — add/edit time slot", "screen": "S3, S4", "state": "S3.ERROR, S4.ERROR", "prototype": "REUSE", "wcag": "W-S3-02, W-S4-02" },
+    { "requirement": "PO Decision D-06 (activation toast)", "journeyStep": "J1 — toggle slot status", "screen": "S1", "state": "S1.INT-ROW-STATUS-TOGGLE", "prototype": "REUSE", "wcag": "W-S1-02" },
+    { "requirement": "PO Decision D-09 (create-Pool branch)", "journeyStep": "J0 — entry", "screen": "S1, S2", "state": "L1", "prototype": "N/A (Logic Node)", "wcag": "— (no user-visible screen)" },
+    { "requirement": "— (no source, new requirement per D-09)", "journeyStep": "J2 — create new Pool", "screen": "S2", "state": "S2.EMPTY, S2.FORM, S2.CONFIRMATION, S2.SUCCESS", "prototype": "NEW / MISSING", "wcag": "W-S2-01, W-S2-02, W-S2-03" }
+  ]
+}

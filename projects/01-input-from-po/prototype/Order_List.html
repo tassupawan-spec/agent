@@ -1,0 +1,2691 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Order List · CFW Inquiry</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Sarabun', 'Noto Sans Thai', Arial, sans-serif;
+    background: #F5F5F7;
+    color: #333333;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  a { color: inherit; }
+  button { font-family: inherit; }
+
+  /* ===== App layout ===== */
+  .app { display: flex; min-height: 100vh; }
+  .sidebar { width: 240px; background: #FFFFFF; border-right: 1px solid #E5E7EB; flex-shrink: 0; }
+  .logo { padding: 24px 28px 20px; border-bottom: 1px solid #F0F0F2; }
+  .logo-mark { font-size: 10px; color: #6B7280; letter-spacing: 1px; font-weight: 600; }
+  .logo-name { font-size: 22px; font-weight: 800; color: #1E2D52; letter-spacing: 1px; margin-top: 2px; }
+  .nav { padding: 16px 0; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 24px; color: #4B5563; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; }
+  .nav-item.active { background: #F3F4F8; color: #1E2D52; font-weight: 600; border-left-color: #1E2D52; }
+  .nav-item.parent { font-weight: 600; color: #1E2D52; }
+  .nav-sub { padding-left: 54px; font-size: 13px; color: #6B7280; padding-top: 8px; padding-bottom: 8px; cursor: pointer; }
+  .nav-sub.active { color: #1E2D52; font-weight: 600; }
+  .main { flex: 1; display: flex; flex-direction: column; }
+  .topbar { height: 64px; background: #FFFFFF; border-bottom: 1px solid #E5E7EB; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; }
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+  .hamburger { font-size: 20px; color: #6B7280; cursor: pointer; }
+  .page-title { font-size: 18px; font-weight: 700; color: #1E2D52; }
+  .breadcrumb { display: flex; align-items: center; gap: 8px; color: #6B7280; font-size: 13px; margin-left: 24px; }
+  .breadcrumb .sep { color: #C5C7D1; }
+  .breadcrumb .current { color: #1E2D52; font-weight: 500; }
+  .topbar-right { display: flex; align-items: center; gap: 20px; font-size: 13px; }
+  .topbar-right .label { color: #6B7280; }
+  .topbar-right .value { color: #1E2D52; font-weight: 600; }
+  .user { display: flex; align-items: center; gap: 10px; padding-left: 16px; border-left: 1px solid #E5E7EB; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: #DDE1EB; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #1E2D52; font-size: 12px; }
+  .user-info { line-height: 1.2; }
+  .user-email { font-size: 13px; color: #1E2D52; font-weight: 500; }
+  .user-role { font-size: 11px; color: #6B7280; }
+
+  .content { padding: 24px 32px; flex: 1; }
+  .card { background: #FFFFFF; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03); padding: 24px 28px; }
+
+  /* ===== Tabs ===== */
+  .tabs-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 12px; flex-wrap: wrap; }
+  .tab-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tab { padding: 10px 22px; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 6px; border: 1px solid transparent; background: transparent; color: #6B7280; transition: all .15s ease; }
+  .tab.active { background: #1E2D52; color: #FFFFFF; }
+  .tab:not(.active):hover { background: #F3F4F8; color: #1E2D52; }
+  .tab.link::after { content: ' ↗'; font-size: 10px; color: #9CA3AF; }
+  .updated { font-size: 13px; color: #6B7280; }
+  .updated strong { color: #1E2D52; font-weight: 600; }
+
+  .order-header { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 18px; margin-bottom: 14px; }
+  .order-id { font-size: 18px; font-weight: 700; color: #1E2D52; }
+  .order-id span { font-weight: 400; color: #6B7280; font-size: 14px; margin-right: 4px; }
+  .order-customer { font-size: 15px; color: #1E2D52; display: inline-flex; align-items: baseline; gap: 6px; }
+  .order-customer .lbl { font-size: 11px; font-weight: 600; color: #6B7280; letter-spacing: 0.3px; text-transform: uppercase; }
+  .order-customer .name { font-weight: 700; }
+  .order-customer .ico { color: #9CA3AF; font-size: 12px; }
+  .order-divider { width: 1px; height: 14px; background: #D1D5DB; }
+  /* VIP badge (gold pill + red VIP text + crown on top) */
+  .vip-badge {
+    display: inline-flex; align-items: center;
+    position: relative;
+    padding: 3px 12px 3px 12px;
+    background: linear-gradient(180deg, #FBBF24 0%, #F59E0B 100%);
+    color: #B91C1C;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(180,83,9,0.35), inset 0 1px 0 rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    vertical-align: middle;
+    margin-left: 8px;
+    line-height: 1.3;
+    font-family: 'Arial Black', 'Helvetica', sans-serif;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .vip-badge::before {
+    content: '👑';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-6deg);
+    font-size: 13px;
+    line-height: 1;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));
+  }
+
+  .design-note { background: linear-gradient(135deg, #FEF3C7 0%, #FED7AA 100%); border: 1px solid #FCD34D; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #78350F; }
+
+  /* ===== Section titles ===== */
+  .section-title { font-size: 15px; font-weight: 700; color: #1E2D52; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  .section-title::before { content: ''; width: 3px; height: 16px; background: #1E2D52; border-radius: 2px; }
+
+  /* ===== Tab panels ===== */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ===== Info sections (Order Information tab) — compact ===== */
+  .info-section { padding: 0; margin-bottom: 12px; }
+  .info-section .section-title { margin-bottom: 10px; font-size: 13px; }
+  .info-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px 12px; }
+  .field { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .field-label { font-size: 10px; font-weight: 600; color: #6B7280; letter-spacing: 0.3px; }
+  .field-value { font-size: 12px; font-weight: 500; color: #1E2D52; padding: 5px 9px; background: #F3F4F6; border: 1px solid transparent; border-radius: 4px; min-height: 28px; display: flex; align-items: center; gap: 8px; word-break: break-word; }
+  .field-value:hover { background: #ECEEF1; }
+  /* Chip-only fields: ไม่มีกล่อง / ไม่มีขอบ — แสดงแค่ chip */
+  .field-value.chip-only { background: transparent; border: none; padding: 4px 0; }
+  .field-value.chip-only:hover { background: transparent; }
+  /* Map ที่อยู่ใน 4-col grid (col 4, span 2 rows) */
+  .info-grid-with-map .map-in-grid { grid-column: 4; grid-row: 1 / span 2; align-self: stretch; display: flex; flex-direction: column; }
+  .info-grid-with-map .map-in-grid .map-canvas { height: auto; flex: 1; min-height: 60px; }
+  .field-action { font-size: 11px; color: #2563EB; font-weight: 500; text-decoration: none; margin-left: auto; flex-shrink: 0; }
+  .field-action:hover { text-decoration: underline; }
+
+  /* ===== Collapsible details sections ===== */
+  .info-details {
+    border: 1px solid #EDEFF3;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    background: #FFFFFF;
+  }
+  .info-details > summary {
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1E2D52;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 0;
+    user-select: none;
+  }
+  .info-details > summary::-webkit-details-marker { display: none; }
+  .info-details > summary::before {
+    content: '▸';
+    color: #6B7280;
+    font-size: 10px;
+    transition: transform .15s ease;
+    display: inline-block;
+  }
+  .info-details[open] > summary::before { transform: rotate(90deg); }
+  .info-details > summary:hover { color: #2A3D6E; }
+
+  /* ===== Quick stats strip (above items) ===== */
+  .quick-strip {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 8px 14px;
+    padding: 10px 14px;
+    background: #FAFBFC;
+    border: 1px solid #EDEFF3;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    font-size: 12px;
+  }
+  .qs-item { display: inline-flex; align-items: center; gap: 6px; }
+  .qs-item strong { color: #1E2D52; font-weight: 600; }
+  .qs-lbl { font-size: 10px; font-weight: 600; color: #6B7280; letter-spacing: 0.3px; text-transform: uppercase; }
+  .qs-sep { width: 1px; height: 16px; background: #D1D5DB; }
+  .qs-total { margin-left: auto; padding-left: 14px; border-left: 1px solid #D1D5DB; }
+
+  /* ===== Top grid (meta + map) ===== */
+  .order-top-grid { display: grid; grid-template-columns: 1fr 280px; gap: 16px; align-items: start; margin-bottom: 14px; }
+  .order-top-left { min-width: 0; }
+  .delivery-map { border: 1px solid #E5E7EB; border-radius: 8px; overflow: hidden; background: #FFFFFF; }
+  .delivery-map .map-canvas {
+    position: relative;
+    height: 150px;
+    background:
+      linear-gradient(120deg, rgba(220,234,252,.4) 0%, rgba(220,234,252,0) 30%),
+      linear-gradient(60deg, rgba(209,250,229,.5) 0%, rgba(209,250,229,0) 25%),
+      repeating-linear-gradient(45deg, #EDF2F7 0 1px, transparent 1px 32px),
+      repeating-linear-gradient(135deg, #EDF2F7 0 1px, transparent 1px 32px),
+      #F8FAFC;
+    overflow: hidden;
+  }
+  .delivery-map .road { position: absolute; background: #FFFFFF; box-shadow: 0 0 0 1px #E5E7EB inset; }
+  .delivery-map .road.r1 { top: 60%; left: -10%; right: -10%; height: 10px; transform: rotate(-8deg); }
+  .delivery-map .road.r2 { top: -10%; bottom: -10%; left: 35%; width: 8px; transform: rotate(12deg); }
+  .delivery-map .road.r3 { top: 25%; left: 10%; right: 30%; height: 6px; transform: rotate(20deg); }
+  .delivery-map .pin {
+    position: absolute; top: 50%; left: 55%;
+    transform: translate(-50%, -100%);
+    font-size: 28px;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25));
+  }
+  .delivery-map .pin-label {
+    position: absolute; top: calc(50% + 6px); left: 55%;
+    transform: translateX(-50%);
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 10px;
+    color: #1E2D52;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  }
+  .delivery-map .map-attribution {
+    position: absolute; bottom: 4px; right: 6px;
+    font-size: 9px; color: #6B7280;
+    background: rgba(255,255,255,0.7); padding: 1px 4px; border-radius: 2px;
+  }
+  .delivery-map .map-footer {
+    padding: 8px 12px; border-top: 1px solid #EDEFF3;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; color: #6B7280;
+  }
+  .delivery-map .map-footer a { color: #2563EB; font-weight: 600; text-decoration: none; }
+  .delivery-map .map-footer a:hover { text-decoration: underline; }
+
+  /* ===== Read-only meta strip (inline label:value) ===== */
+  .meta-strip {
+    display: flex; flex-wrap: wrap; gap: 6px 22px;
+    padding: 10px 14px;
+    background: #FAFBFC;
+    border: 1px solid #EDEFF3;
+    border-radius: 6px;
+    margin-bottom: 14px;
+    font-size: 12px;
+    align-items: center;
+  }
+  .meta-item { color: #6B7280; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .meta-item strong { color: #1E2D52; font-weight: 600; }
+  .meta-item .micro-chip { padding: 2px 8px; background: #DBEAFE; color: #1E40AF; font-size: 11px; font-weight: 600; border-radius: 10px; }
+  .meta-item .micro-chip.muted { background: #F3F4F6; color: #6B7280; }
+
+  /* ===== Inline attribute pills (mini chips under address) ===== */
+  .attr-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; padding-left: 2px; }
+  .attr-pill { font-size: 11px; padding: 3px 10px; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 12px; color: #4B5563; display: inline-flex; align-items: center; gap: 4px; }
+  .attr-pill .attr-key { color: #6B7280; }
+  .attr-pill .attr-val { color: #1E2D52; font-weight: 600; }
+  .attr-pill.empty .attr-val { color: #9CA3AF; font-weight: 500; }
+
+  /* ===== Notes textarea-like ===== */
+  .notes-box {
+    background: #FFFBEB;
+    border: 1px solid #FCD34D;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #78350F;
+    min-height: 40px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .notes-box.empty { background: #FAFBFC; border-color: #EDEFF3; color: #9CA3AF; }
+  .notes-box .notes-icon { font-size: 14px; }
+
+  /* ============================================================ */
+  /* ============ TAB 1: Status Detail (from v1) ================ */
+  /* ============================================================ */
+  .summary-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .summary-cell { background: #FAFBFC; border: 1px solid #EDEFF3; border-radius: 8px; padding: 14px 16px; }
+  .summary-cell .label { font-size: 11px; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 600; }
+  .summary-cell .value { font-size: 14px; color: #1E2D52; font-weight: 600; }
+  .status-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; background: #DBEAFE; color: #1E40AF; }
+  .status-chip.warning { background: #FEF3C7; color: #92400E; }
+  .status-chip.success { background: #D1FAE5; color: #065F46; }
+  .status-chip.danger { background: #FEE2E2; color: #991B1B; }
+  .status-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .timeline-section { background: #FAFBFC; border: 1px solid #EDEFF3; border-radius: 10px; padding: 28px 32px; margin-bottom: 20px; }
+  .timeline { position: relative; padding-left: 8px; }
+  .step { position: relative; display: grid; grid-template-columns: 48px 1fr auto; gap: 16px; padding-bottom: 28px; align-items: flex-start; }
+  .step:last-child { padding-bottom: 0; }
+  .step::before { content: ''; position: absolute; left: 23px; top: 48px; bottom: -4px; width: 2px; background: #E5E7EB; }
+  .step:last-child::before { display: none; }
+  .step.done::before { background: #10B981; }
+  .step.current::before { background: linear-gradient(180deg, #10B981 0%, #E5E7EB 100%); }
+  .step-icon { width: 48px; height: 48px; border-radius: 50%; background: #FFFFFF; border: 2px solid #E5E7EB; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; position: relative; z-index: 1; }
+  .step.done .step-icon { background: #10B981; border-color: #10B981; color: #FFFFFF; }
+  .step.current .step-icon { background: #1E2D52; border-color: #1E2D52; color: #FFFFFF; box-shadow: 0 0 0 4px rgba(30,45,82,0.12); }
+  .step.pending .step-icon { color: #C5C7D1; }
+  .step-body { padding-top: 6px; }
+  .step-title { font-size: 15px; font-weight: 700; color: #1E2D52; display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .step.pending .step-title { color: #9CA3AF; }
+  .badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .badge.done { background: #D1FAE5; color: #065F46; }
+  .badge.current { background: #DBEAFE; color: #1E40AF; }
+  .badge.pending { background: #F3F4F6; color: #6B7280; }
+  .badge.invalid { background: #FEE2E2; color: #991B1B; }
+  .badge.extra { background: #D1FAE5; color: #065F46; }
+  .step-sub { font-size: 13px; color: #6B7280; margin-bottom: 8px; }
+  .step-meta { font-size: 12px; color: #6B7280; display: flex; flex-wrap: wrap; gap: 16px; }
+  .step-meta .meta-item { display: flex; align-items: center; gap: 6px; }
+  .step-meta .meta-item strong { color: #1E2D52; font-weight: 600; }
+  .step-time { font-size: 13px; color: #1E2D52; font-weight: 600; white-space: nowrap; text-align: right; padding-top: 8px; }
+  .step.pending .step-time { color: #C5C7D1; font-weight: 500; }
+
+  /* ============================================================ */
+  /* ============ TAB 2: Payment Detail ========================= */
+  /* ============================================================ */
+  .payment-summary { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .pay-card { background: #FAFBFC; border: 1px solid #EDEFF3; border-radius: 8px; padding: 18px 20px; }
+  .pay-card.highlight { background: #FFF8E6; border-color: #FCE7A3; }
+  .pay-card.success { background: #ECFDF5; border-color: #A7F3D0; }
+  .pay-card .label { font-size: 11px; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 600; }
+  .pay-card .amount { font-size: 26px; font-weight: 800; color: #1E2D52; }
+  .pay-card.success .amount { color: #065F46; }
+  .pay-card.highlight .amount { color: #92400E; }
+  .pay-card .sub { font-size: 12px; color: #6B7280; margin-top: 4px; }
+
+  .pay-method-summary { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .pay-method-chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; background: #F3F4F8; border-radius: 16px; font-size: 12px; color: #4B5563; }
+  .pay-method-chip .m-icon { width: 22px; height: 22px; border-radius: 4px; background: #1E2D52; color: white; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .pay-method-chip .m-amt { font-weight: 700; color: #1E2D52; }
+
+  table.data { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+  table.data thead th { background: #F3F4F8; color: #1E2D52; font-weight: 700; padding: 12px 28px 12px 14px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #E5E7EB; cursor: pointer; user-select: none; position: relative; }
+  table.data thead th::after { content: '↕'; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 10px; color: #9CA3AF; opacity: 0.55; font-weight: 700; transition: opacity .15s ease, color .15s ease; }
+  table.data thead th:hover::after { opacity: 1; color: #1E2D52; }
+  table.data thead th.sort-asc::after { content: '↑'; color: #1E2D52; opacity: 1; font-size: 12px; }
+  table.data thead th.sort-desc::after { content: '↓'; color: #1E2D52; opacity: 1; font-size: 12px; }
+  table.data thead th.no-sort { cursor: default; padding-right: 14px; }
+  table.data thead th.no-sort::after { display: none; }
+  table.data tbody td { padding: 14px; border-bottom: 1px solid #F0F2F5; vertical-align: middle; }
+  table.data tbody tr:last-child td { border-bottom: none; }
+  table.data tbody tr:hover { background: #FAFBFC; }
+  table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .table-wrap { background: white; border: 1px solid #EDEFF3; border-radius: 8px; overflow: hidden; margin-bottom: 18px; }
+  .table-header { padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EDEFF3; }
+  .table-header h3 { font-size: 14px; color: #1E2D52; font-weight: 700; }
+
+  .method-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; background: #F3F4F8; color: #1E2D52; }
+  .method-pill .m-mini { width: 18px; height: 18px; border-radius: 3px; color: white; font-size: 9px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+  .m-t1cb { background: #DC2626; }
+  .m-kbnk { background: #006F3C; }
+  .m-cash { background: #6B7280; }
+  .m-cod { background: #92400E; }
+  .m-qr { background: #1E40AF; }
+  .m-credit { background: #581C87; }
+
+  /* ============================================================ */
+  /* ============ TAB 3: Promotion by SKU ======================= */
+  /* ============================================================ */
+  .promo-table-wrap { background: white; border: 1px solid #EDEFF3; border-radius: 8px; overflow-x: auto; }
+  table.promo-sku { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; min-width: 1400px; }
+  table.promo-sku thead th { background: #F3F4F8; color: #1E2D52; font-weight: 700; padding: 12px 24px 12px 10px; text-align: left; font-size: 11px; border-bottom: 1px solid #E5E7EB; white-space: nowrap; cursor: pointer; user-select: none; position: relative; }
+  table.promo-sku thead th::after { content: '↕'; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 10px; color: #9CA3AF; opacity: 0.55; font-weight: 700; transition: opacity .15s ease, color .15s ease; }
+  table.promo-sku thead th:hover::after { opacity: 1; color: #1E2D52; }
+  table.promo-sku thead th.sort-asc::after { content: '↑'; color: #1E2D52; opacity: 1; font-size: 12px; }
+  table.promo-sku thead th.sort-desc::after { content: '↓'; color: #1E2D52; opacity: 1; font-size: 12px; }
+  table.promo-sku thead th.no-sort { cursor: default; padding-right: 10px; }
+  table.promo-sku thead th.no-sort::after { display: none; }
+  table.promo-sku thead th.group-blue { background: #DBEAFE; color: #1E40AF; }
+  table.promo-sku thead th.group-green { background: #D1FAE5; color: #065F46; }
+  table.promo-sku tbody td { padding: 14px 10px; border-bottom: 1px solid #F0F2F5; vertical-align: top; font-size: 12px; }
+  table.promo-sku tbody td.col-blue { background: #EFF6FF; }
+  table.promo-sku tbody td.col-green { background: #F0FDF4; }
+  table.promo-sku tbody td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; color: #1E2D52; }
+  table.promo-sku tbody td.num.negative { color: #DC2626; }
+  table.promo-sku tbody td.num.positive { color: #059669; }
+  .product-thumb { width: 50px; height: 50px; border-radius: 6px; background: #F3F4F8; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .product-name { font-weight: 600; color: #1E2D52; margin-bottom: 4px; }
+  .promo-line { font-size: 11px; display: inline-block; margin-top: 2px; }
+  .promo-line.red { color: #DC2626; }
+  .promo-line.green { color: #059669; }
+  .promo-line.blue { color: #2563EB; }
+  .promo-line.remark { color: #9CA3AF; }
+
+  /* ============================================================ */
+  /* ============ TAB 4: Promotion Summary ====================== */
+  /* ============================================================ */
+  .summary-grid { display: grid; grid-template-columns: 1.2fr 1.4fr 1fr; gap: 16px; align-items: stretch; }
+  .summary-card { border-radius: 10px; padding: 18px 20px; border: 1px solid; }
+  .summary-card h4 { font-size: 13px; font-weight: 800; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid; display: flex; align-items: center; gap: 8px; }
+  .summary-card h4::before { content: ''; width: 3px; height: 14px; border-radius: 2px; }
+
+  /* Card 1: Privilege/Free items (Red theme) */
+  .card-privilege { background: #FFF5F5; border-color: #FECACA; }
+  .card-privilege h4 { color: #991B1B; border-color: #FECACA; }
+  .card-privilege h4::before { background: #DC2626; }
+  .privilege-item { display: flex; gap: 10px; padding: 8px 0; font-size: 12px; color: #4B5563; line-height: 1.5; align-items: flex-start; }
+  .privilege-item .pnum { flex-shrink: 0; font-weight: 700; color: #991B1B; }
+  .privilege-item.valid { color: #059669; font-weight: 500; }
+  .privilege-item.invalid { color: #DC2626; }
+
+  /* Card 2: Discounts */
+  .card-discount { background: #FFFFFF; border-color: #EDEFF3; }
+  .card-discount h4 { color: #1E2D52; border-color: #EDEFF3; }
+  .card-discount h4::before { background: #1E2D52; }
+  .discount-header { display: grid; grid-template-columns: 1fr 80px 100px 80px 30px; gap: 8px; font-size: 10px; color: #6B7280; font-weight: 700; text-transform: uppercase; padding: 6px 0; border-bottom: 1px solid #F0F2F5; }
+  .discount-row { display: grid; grid-template-columns: 1fr 80px 100px 80px 30px; gap: 8px; padding: 10px 0; font-size: 12px; color: #1E2D52; border-bottom: 1px dashed #F0F2F5; align-items: flex-start; }
+  .discount-row .d-desc { color: #4B5563; }
+  .discount-row .d-num { text-align: right; font-variant-numeric: tabular-nums; }
+  .discount-row .d-btn { background: #FEE2E2; color: #991B1B; border: none; width: 22px; height: 22px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 700; }
+  .discount-sub { padding-left: 14px; font-size: 11px; color: #6B7280; }
+  .discount-sub .item-sku { color: #2563EB; font-weight: 600; }
+
+  /* Card 3: Summary totals */
+  .card-totals { background: #FAFBFC; border-color: #EDEFF3; }
+  .card-totals h4 { color: #1E2D52; border-color: #EDEFF3; }
+  .card-totals h4::before { background: #10B981; }
+  .total-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 12px; color: #4B5563; }
+  .total-row strong { font-weight: 700; color: #1E2D52; font-variant-numeric: tabular-nums; }
+  .total-row.warning strong { color: #DC2626; }
+  .total-row.success strong { color: #059669; }
+  .total-divider { border-top: 1px solid #E5E7EB; margin: 8px 0; }
+  .total-split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 8px 0; }
+  .total-split .ts-col { font-size: 11px; }
+  .total-split .ts-col h5 { font-size: 11px; color: #6B7280; font-weight: 700; margin-bottom: 6px; }
+  .total-split .ts-row { display: flex; justify-content: space-between; padding: 3px 0; color: #4B5563; }
+  .total-split .ts-row strong { color: #1E2D52; font-variant-numeric: tabular-nums; }
+  .grand-total { background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 8px; padding: 14px 16px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .grand-total .gt-label { font-size: 13px; font-weight: 700; color: #065F46; }
+  .grand-total .gt-value { font-size: 22px; font-weight: 800; color: #065F46; font-variant-numeric: tabular-nums; }
+
+  /* ===== Actions ===== */
+  .actions { display: flex; justify-content: center; gap: 12px; padding-top: 12px; margin-top: 20px; }
+  .btn { padding: 10px 28px; border-radius: 6px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-primary { background: #1E2D52; color: #FFFFFF; }
+  .btn-primary:hover { background: #2A3D6E; }
+  .btn-secondary { background: #FFFFFF; color: #1E2D52; border: 1px solid #D1D5DB; }
+  .btn-secondary:hover { background: #F3F4F8; }
+  .btn-success { background: #10B981; color: #FFFFFF; }
+  .btn-success:hover { background: #059669; }
+  .btn-danger { background: #D55B5B; color: #FFFFFF; }
+  .btn-danger:hover { background: #BD4D4D; }
+  .btn-warning { background: #FBBF24; color: #78350F; }
+  .btn-warning:hover { background: #F59E0B; }
+  .btn-small { padding: 6px 14px; font-size: 12px; }
+
+  /* ===== History Log (Tab) ===== */
+  .history-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #EDEFF3; }
+  .history-filter .h-chip { font-size: 12px; padding: 5px 12px; border-radius: 14px; background: #F3F4F8; color: #4B5563; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
+  .history-filter .h-chip:hover { background: #E5E7EB; }
+  .history-filter .h-chip.active { background: #1E2D52; color: #FFFFFF; }
+  .history-list { display: flex; flex-direction: column; gap: 0; }
+  .history-entry {
+    display: grid;
+    grid-template-columns: 110px 40px 1fr;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid #F0F2F5;
+    position: relative;
+  }
+  .history-entry:last-child { border-bottom: none; }
+  .h-time { text-align: right; font-size: 11px; color: #6B7280; padding-top: 4px; }
+  .h-time .h-date { display: block; font-weight: 600; color: #1E2D52; font-size: 12px; }
+  .h-icon-col { position: relative; display: flex; flex-direction: column; align-items: center; }
+  .h-icon {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0; z-index: 1;
+    background: #DBEAFE; color: #1E40AF;
+  }
+  .h-icon.create { background: #D1FAE5; color: #065F46; }
+  .h-icon.edit { background: #DBEAFE; color: #1E40AF; }
+  .h-icon.status { background: #FEF3C7; color: #92400E; }
+  .h-icon.note { background: #E0E7FF; color: #3730A3; }
+  .h-icon.cancel { background: #FEE2E2; color: #991B1B; }
+  .h-icon-col::after {
+    content: '';
+    position: absolute; top: 32px; bottom: -14px; left: 50%;
+    width: 2px; background: #E5E7EB; transform: translateX(-50%);
+  }
+  .history-entry:last-child .h-icon-col::after { display: none; }
+  .h-body { min-width: 0; padding-top: 2px; }
+  .h-action-line { font-size: 13px; color: #1E2D52; margin-bottom: 4px; }
+  .h-action-line .h-user { font-weight: 700; }
+  .h-action-line .h-verb { font-weight: 500; color: #4B5563; }
+  .h-action-line .h-field { font-weight: 600; color: #1E2D52; }
+  .h-detail-row { display: flex; gap: 8px; align-items: center; margin-top: 6px; font-size: 12px; }
+  .h-diff { display: inline-flex; align-items: center; gap: 6px; }
+  .h-before, .h-after { padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .h-before { background: #FEE2E2; color: #991B1B; text-decoration: line-through; text-decoration-color: rgba(153,27,27,0.4); }
+  .h-after { background: #D1FAE5; color: #065F46; }
+  .h-arrow { color: #9CA3AF; font-size: 12px; }
+  .h-tag {
+    display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+    background: #F3F4F8; color: #4B5563; letter-spacing: 0.3px; text-transform: uppercase;
+  }
+  .h-tag.create { background: #D1FAE5; color: #065F46; }
+  .h-tag.edit { background: #DBEAFE; color: #1E40AF; }
+  .h-tag.status { background: #FEF3C7; color: #92400E; }
+  .h-tag.note { background: #E0E7FF; color: #3730A3; }
+
+  /* ===== Modal (Cancel / generic) ===== */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .18s ease;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: #FFFFFF;
+    border-radius: 10px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.22);
+    width: 100%; max-width: 560px;
+    transform: translateY(8px);
+    transition: transform .2s ease;
+    overflow: hidden;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal.modal-lg { max-width: 720px; }
+  .modal.modal-lg .modal-body { max-height: 70vh; overflow-y: auto; padding: 20px 24px; }
+  .modal-section { margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid #EDEFF3; }
+  .modal-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+  .modal-section-title { font-size: 13px; font-weight: 700; color: #1E2D52; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .modal-section-title::before { content: ''; width: 3px; height: 14px; background: #1E2D52; border-radius: 2px; }
+  .modal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 14px; }
+  .modal-grid .col-full { grid-column: span 2; }
+  .modal-grid .form-field { margin-bottom: 0; }
+  .modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #EDEFF3;
+    display: flex; align-items: center; justify-content: space-between;
+    color: #1E2D52;
+  }
+  .modal-header h3 { font-size: 16px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
+  .modal-header .mod-icon { width: 28px; height: 28px; border-radius: 50%; background: #1E2D52; color: white; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .modal-close { background: transparent; border: none; font-size: 22px; color: #9CA3AF; cursor: pointer; padding: 0; line-height: 1; }
+  .modal-close:hover { color: #1E2D52; }
+  .modal-body { padding: 22px 24px; }
+  .modal-actions { padding: 14px 20px 18px; display: flex; justify-content: center; gap: 12px; }
+
+  .form-field { margin-bottom: 16px; }
+  .form-field:last-child { margin-bottom: 0; }
+  .form-field label { display: block; font-size: 13px; font-weight: 600; color: #1E2D52; margin-bottom: 6px; }
+  .form-field label .req { color: #DC2626; margin-left: 2px; }
+  .form-field .input,
+  .form-field .select,
+  .form-field textarea {
+    width: 100%;
+    font-size: 13px; color: #1E2D52;
+    padding: 9px 12px;
+    background: #FFFFFF;
+    border: 1px solid #D1D5DB;
+    border-radius: 6px;
+    outline: none;
+    font-family: inherit;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .form-field textarea { resize: vertical; min-height: 90px; }
+  .form-field .input:focus,
+  .form-field .select:focus,
+  .form-field textarea:focus { border-color: #1E2D52; box-shadow: 0 0 0 3px rgba(30,45,82,0.08); }
+  .form-field .select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236B7280' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+  }
+  .form-field .readonly { background: #F3F4F6; color: #4B5563; cursor: not-allowed; }
+
+  /* ===== Postpone view (multi-step wizard) ===== */
+  .view-postpone { display: none; }
+  .view-postpone.active { display: block; }
+  .view-main.hidden { display: none; }
+
+  .pp-card { background: #FFFFFF; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); padding: 0; overflow: hidden; }
+  .pp-header { background: #1E2D52; color: #FFFFFF; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .pp-header h2 { font-size: 16px; font-weight: 700; }
+  .pp-header .pp-back-btn { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.25); padding: 6px 14px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .pp-header .pp-back-btn:hover { background: rgba(255,255,255,0.28); }
+
+  /* Stepper */
+  .pp-stepper {
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+    padding: 18px 20px; background: #FAFBFC; border-bottom: 1px solid #EDEFF3;
+  }
+  .pp-step { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: #6B7280; font-weight: 600; }
+  .pp-step .pp-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #E5E7EB; color: #6B7280;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .pp-step.active { color: #1E2D52; }
+  .pp-step.active .pp-num { background: #1E2D52; color: #FFFFFF; }
+  .pp-step.done .pp-num { background: #10B981; color: #FFFFFF; }
+  .pp-stepper .pp-dash { width: 40px; height: 2px; background: #E5E7EB; }
+  .pp-stepper .pp-dash.done { background: #10B981; }
+
+  .pp-body { padding: 22px 26px; }
+  .pp-step-content { display: none; }
+  .pp-step-content.active { display: block; }
+  .pp-section-title { font-size: 14px; font-weight: 700; color: #1E2D52; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+  .pp-section-title::before { content: '▾'; color: #1E2D52; font-size: 12px; }
+
+  .pp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; }
+  .pp-grid .col-full { grid-column: span 2; }
+
+  .pp-readonly-field { display: flex; flex-direction: column; gap: 4px; }
+  .pp-readonly-field label { font-size: 12px; font-weight: 600; color: #1E2D52; }
+  .pp-readonly-field label .req { color: #DC2626; margin-left: 2px; }
+  .pp-readonly-field .value-box {
+    font-size: 13px; color: #4B5563;
+    padding: 9px 12px;
+    background: #F3F4F6;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    min-height: 38px;
+    display: flex; align-items: center;
+  }
+  .pp-readonly-field .value-box.with-action { padding-right: 6px; justify-content: space-between; }
+  .pp-readonly-field .value-box .lock { color: #9CA3AF; font-size: 11px; flex-shrink: 0; margin-left: 8px; }
+
+  .pp-map-readonly {
+    grid-column: span 2;
+    border: 1px solid #E5E7EB; border-radius: 8px; overflow: hidden;
+    height: 200px; position: relative;
+    background:
+      linear-gradient(120deg, rgba(220,234,252,.4) 0%, rgba(220,234,252,0) 30%),
+      linear-gradient(60deg, rgba(209,250,229,.5) 0%, rgba(209,250,229,0) 25%),
+      repeating-linear-gradient(45deg, #EDF2F7 0 1px, transparent 1px 32px),
+      repeating-linear-gradient(135deg, #EDF2F7 0 1px, transparent 1px 32px),
+      #F8FAFC;
+  }
+  .pp-map-readonly .road { position: absolute; background: #FFFFFF; box-shadow: 0 0 0 1px #E5E7EB inset; }
+  .pp-map-readonly .road.r1 { top: 60%; left: -10%; right: -10%; height: 12px; transform: rotate(-8deg); }
+  .pp-map-readonly .road.r2 { top: -10%; bottom: -10%; left: 35%; width: 10px; transform: rotate(12deg); }
+  .pp-map-readonly .pin { position: absolute; top: 50%; left: 55%; transform: translate(-50%, -100%); font-size: 36px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25)); }
+
+  .pp-actions { padding: 16px 26px 24px; display: flex; justify-content: center; gap: 12px; }
+
+  /* ===== Calendar (Postpone step 2) ===== */
+  .cal-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .cal-toolbar .cal-title { font-size: 16px; font-weight: 700; color: #1E2D52; }
+  .cal-toolbar .cal-nav { display: inline-flex; gap: 6px; }
+  .cal-toolbar .cal-nav button {
+    width: 32px; height: 32px; border-radius: 6px;
+    background: #F3F4F8; border: 1px solid #E5E7EB; color: #1E2D52;
+    cursor: pointer; font-size: 13px; font-weight: 600;
+  }
+  .cal-toolbar .cal-nav button:hover { background: #E5E7EB; }
+  .cal-toolbar .cal-today-btn {
+    background: #1E2D52; color: white; border: none;
+    padding: 7px 14px; border-radius: 6px;
+    font-size: 12px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  }
+  .cal-toolbar .cal-today-btn:hover { background: #2A3D6E; }
+
+  .calendar { border: 1px solid #E5E7EB; border-radius: 8px; overflow: hidden; }
+  .calendar-head, .calendar-row { display: grid; grid-template-columns: repeat(7, 1fr); }
+  .calendar-head .ch { padding: 10px 8px; background: #FAFBFC; font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #E5E7EB; text-align: center; }
+  .calendar-row .cell {
+    min-height: 96px; padding: 8px;
+    border-right: 1px solid #F0F2F5; border-bottom: 1px solid #F0F2F5;
+    display: flex; flex-direction: column; gap: 6px;
+    background: #FFFFFF;
+  }
+  .calendar-row .cell:last-child { border-right: none; }
+  .calendar-row .cell.muted { background: #FAFBFC; color: #C5C7D1; }
+  .calendar-row .cell .day-num { font-size: 13px; font-weight: 600; color: #4B5563; text-align: right; }
+  .calendar-row .cell.weekend .day-num { color: #DC2626; }
+  .calendar-row .cell.today .day-num {
+    background: #6B7280; color: white;
+    width: 24px; height: 24px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-left: auto;
+    font-weight: 700;
+  }
+  .slot-row { display: flex; flex-wrap: wrap; gap: 3px; margin-top: auto; }
+  .slot-pill {
+    font-size: 10px; font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 4px;
+    background: #E5E7EB; color: #9CA3AF;
+    cursor: not-allowed; border: none;
+  }
+  .slot-pill.available {
+    background: #FEE2E2; color: #991B1B;
+    cursor: pointer;
+  }
+  .slot-pill.available:hover { background: #FCA5A5; }
+  .slot-pill.selected { background: #1E2D52; color: white; }
+
+  .calendar-legend {
+    display: flex; gap: 18px; padding: 12px 0 4px; font-size: 11px; color: #6B7280;
+  }
+  .calendar-legend .lg-dot {
+    display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: middle; margin-right: 6px;
+  }
+
+  /* Summary (Step 3) — renamed to avoid clash with Promotion Summary .summary-grid */
+  .pp-summary-grid { display: grid; grid-template-columns: 180px 1fr; gap: 8px 16px; padding: 16px 18px; background: #FAFBFC; border: 1px solid #EDEFF3; border-radius: 8px; }
+  .pp-summary-grid .s-label { font-size: 12px; color: #6B7280; font-weight: 600; }
+  .pp-summary-grid .s-value { font-size: 13px; color: #1E2D52; font-weight: 500; }
+  .pp-summary-grid .s-value strong { font-weight: 700; }
+  .summary-banner {
+    background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46;
+    padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;
+    font-size: 13px; display: flex; align-items: center; gap: 10px;
+  }
+
+  /* Empty hint banner inside placeholder tabs */
+  .placeholder-hint { background: #F9FAFB; border: 1px dashed #D1D5DB; border-radius: 8px; padding: 60px 20px; text-align: center; color: #6B7280; }
+  .placeholder-hint h3 { color: #1E2D52; margin-bottom: 8px; }
+
+  /* ============================================================ */
+  /* ============ ORDER LIST VIEW (Credit Note theme) =========== */
+  /* ============================================================ */
+  .view-list { display: block; }
+  .view-list.hidden { display: none; }
+  .view-detail { display: none; }
+  .view-detail.active { display: block; }
+
+  .list-page-card { background: #FFFFFF; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03); padding: 24px 28px; }
+
+  /* Search section */
+  .search-section { background: #FAFBFC; border: 1px solid #EDEFF3; border-radius: 10px; padding: 18px 20px; margin-bottom: 20px; }
+  .search-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 16px; margin-bottom: 14px; }
+  .search-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .search-field label { font-size: 11px; font-weight: 600; color: #6B7280; letter-spacing: 0.3px; text-transform: uppercase; }
+  .search-field .input,
+  .search-field .select,
+  .search-field input[type="date"] {
+    font-size: 13px; font-weight: 500; color: #1E2D52;
+    padding: 8px 12px; background: #FFFFFF; border: 1px solid #D1D5DB;
+    border-radius: 6px; min-height: 36px; outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease; font-family: inherit; width: 100%;
+  }
+  .search-field .input:focus,
+  .search-field .select:focus,
+  .search-field input[type="date"]:focus { border-color: #1E2D52; box-shadow: 0 0 0 3px rgba(30,45,82,0.08); }
+  .search-field .select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236B7280' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+  .date-range { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
+  .date-range .sep { color: #9CA3AF; font-size: 12px; }
+  .search-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+  .search-btns { display: inline-flex; gap: 10px; flex-wrap: wrap; }
+  .btn-success { background: #10B981; color: #FFFFFF; }
+  .btn-success:hover { background: #059669; }
+
+  /* List result card */
+  .list-card { border: 1px solid #EDEFF3; border-radius: 10px; overflow: hidden; background: #FFFFFF; }
+  .list-header { background: #1E2D52; color: #FFFFFF; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 700; }
+  .list-header .count-pill { font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 10px; }
+  .list-scroll { overflow-x: auto; }
+
+  /* List table (scoped) */
+  table.list-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+  table.list-table thead th { background: #F3F4F8; color: #1E2D52; font-weight: 700; padding: 11px 26px 11px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #E5E7EB; white-space: nowrap; cursor: pointer; user-select: none; position: relative; }
+  table.list-table thead th::after { content: '\2195'; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 10px; color: #9CA3AF; opacity: 0.55; font-weight: 700; transition: opacity .15s ease, color .15s ease; }
+  table.list-table thead th:hover::after { opacity: 1; color: #1E2D52; }
+  table.list-table thead th.sort-asc::after { content: '\2191'; color: #1E2D52; opacity: 1; font-size: 12px; }
+  table.list-table thead th.sort-desc::after { content: '\2193'; color: #1E2D52; opacity: 1; font-size: 12px; }
+  table.list-table thead th.no-sort { cursor: default; padding-right: 14px; }
+  table.list-table thead th.no-sort::after { display: none; }
+  table.list-table tbody td { padding: 12px 14px; border-bottom: 1px solid #F0F2F5; vertical-align: middle; color: #1E2D52; }
+  table.list-table tbody tr:last-child td { border-bottom: none; }
+  table.list-table tbody tr:hover { background: #FAFBFC; cursor: pointer; }
+  table.list-table .col-no { width: 50px; text-align: center; color: #6B7280; }
+  table.list-table .col-num { font-family: 'SF Mono', 'Menlo', monospace; font-size: 12px; color: #1E2D52; }
+  table.list-table .col-branch { color: #4B5563; font-size: 12px; }
+  table.list-table .col-action { width: 80px; text-align: center; }
+  table.list-table .empty-row td { text-align: center; color: #9CA3AF; padding: 40px 14px; cursor: default; }
+  table.list-table .empty-row:hover td { background: transparent; }
+
+  .icon-action-btn { width: 34px; height: 28px; border-radius: 4px; background: #1E2D52; color: white; border: none; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; transition: background .15s ease; }
+  .icon-action-btn:hover { background: #2A3D6E; }
+
+  /* Status chips for list (extends shared .status-chip) */
+  .status-chip.pending { background: #FEF3C7; color: #92400E; }
+  .status-chip.info { background: #DBEAFE; color: #1E40AF; }
+
+  /* Pagination */
+  .pagination { padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #EDEFF3; font-size: 12px; color: #6B7280; flex-wrap: wrap; gap: 10px; }
+  .pagination .pages { display: inline-flex; gap: 4px; }
+  .pagination .page-btn { min-width: 30px; height: 30px; padding: 0 6px; border-radius: 6px; border: 1px solid #E5E7EB; background: #FFFFFF; color: #4B5563; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .pagination .page-btn:hover:not(:disabled):not(.active) { background: #F3F4F8; }
+  .pagination .page-btn.active { background: #1E2D52; color: #FFFFFF; border-color: #1E2D52; }
+  .pagination .page-btn:disabled { color: #C5C7D1; cursor: not-allowed; }
+  .page-size { margin-left: 6px; padding: 4px 8px; border: 1px solid #D1D5DB; border-radius: 4px; font-size: 12px; font-family: inherit; }
+
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">CENTRAL GROUP</div>
+      <div class="logo-name">SPRINT</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-item">🏠 Home</div>
+      <div class="nav-item active parent">📋 Inquiry <span style="margin-left:auto">⌄</span></div>
+      <div class="nav-sub active">Order List</div>
+      <div class="nav-sub">Order Dashboard</div>
+      <div class="nav-item parent">🧾 Credit Note <span style="margin-left:auto">›</span></div>
+      <div class="nav-item">🗂️ Master Data <span style="margin-left:auto">›</span></div>
+      <div class="nav-item">📊 Report <span style="margin-left:auto">›</span></div>
+      <div class="nav-item">👥 Access Control <span style="margin-left:auto">›</span></div>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="hamburger">☰</span>
+        <span class="page-title">Inquiry</span>
+        <div class="breadcrumb">
+          <span>🏠</span>
+          <a href="#">Order List</a>
+          <span class="sep">›</span>
+          <span class="current" id="crumb-current">Order List</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span><span class="label">Owner:</span> <span class="value">CFW ⌄</span></span>
+        <span><span class="label">Warehouse:</span> <span class="value">CFW WH ⌄</span></span>
+        <div class="user">
+          <div class="avatar">A</div>
+          <div class="user-info">
+            <div class="user-email">Admin@central.co.th</div>
+            <div class="user-role">Supervisor</div>
+          </div>
+          <span style="color:#9CA3AF;">⌄</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- ============ VIEW: ORDER LIST ============ -->
+      <div class="view-list" id="view-list">
+        <div class="list-page-card">
+
+          <div class="design-note">
+            📋 <strong>Order List</strong> · ค้นหา/กรองรายการคำสั่งซื้อ แล้วกดปุ่ม 👁 ในคอลัมน์ Action (หรือคลิกที่แถว) เพื่อเข้าหน้า Order Detail · กด ← เพื่อกลับมาหน้า List
+          </div>
+
+          <div class="section-title">ค้นหา · Search Filters</div>
+          <div class="search-section">
+            <div class="search-grid">
+              <div class="search-field" style="grid-column: span 2;">
+                <label>Order Date · ช่วงวันที่</label>
+                <div class="date-range">
+                  <input type="date" id="f-date-from">
+                  <span class="sep">→</span>
+                  <input type="date" id="f-date-to">
+                </div>
+              </div>
+              <div class="search-field">
+                <label>สาขา · Branch</label>
+                <select class="select" id="f-branch">
+                  <option value="">แสดงทุกสาขา</option>
+                </select>
+              </div>
+              <div class="search-field">
+                <label>สถานะ · Status</label>
+                <select class="select" id="f-status">
+                  <option value="">แสดงทุกสถานะ</option>
+                </select>
+              </div>
+              <div class="search-field">
+                <label>Order Type</label>
+                <select class="select" id="f-type">
+                  <option value="">แสดงทุก Order Type</option>
+                </select>
+              </div>
+              <div class="search-field">
+                <label>เลขที่คำสั่งซื้อ · Order No.</label>
+                <input type="text" class="input" id="f-orderno" placeholder="เช่น WP2512...">
+              </div>
+              <div class="search-field">
+                <label>ชื่อ-นามสกุลลูกค้า · Customer</label>
+                <input type="text" class="input" id="f-customer" placeholder="ชื่อ หรือ นามสกุล">
+              </div>
+              <div class="search-field">
+                <label>เบอร์โทรศัพท์ · Phone</label>
+                <input type="text" class="input" id="f-phone" placeholder="08x-xxx-xxxx">
+              </div>
+              <div class="search-field">
+                <label>เลข The 1 Card</label>
+                <input type="text" class="input" id="f-the1" placeholder="The1 Member ID">
+              </div>
+            </div>
+            <div class="search-actions">
+              <div class="search-btns">
+                <button class="btn btn-danger" onclick="clearFilters()">↺ Clear</button>
+                <button class="btn btn-primary" onclick="applySearch()">🔍 ค้นหา</button>
+                <button class="btn btn-success" onclick="downloadExcel()">📥 Download Excel</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="list-card">
+            <div class="list-header">
+              <div style="display:inline-flex; align-items:center; gap:10px;">
+                <span>รายการคำสั่งซื้อ · Order List</span>
+                <span class="count-pill" id="result-count">จำนวน 0 รายการ</span>
+              </div>
+            </div>
+
+            <div class="list-scroll">
+              <table class="list-table" id="order-table">
+                <thead>
+                  <tr>
+                    <th class="col-no no-sort">No.</th>
+                    <th data-sort="orderNo">เลขที่คำสั่งซื้อ</th>
+                    <th data-sort="status">สถานะ</th>
+                    <th data-sort="orderType">Order Type</th>
+                    <th data-sort="date">วันที่</th>
+                    <th data-sort="branch">สาขา</th>
+                    <th data-sort="customer">ลูกค้า</th>
+                    <th class="col-action no-sort">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="order-tbody"></tbody>
+              </table>
+            </div>
+
+            <div class="pagination">
+              <div>
+                <span>Item per page</span>
+                <select class="page-size" id="page-size" onchange="changePageSize()">
+                  <option>10</option>
+                  <option>25</option>
+                  <option>50</option>
+                </select>
+                <span style="margin-left:12px;" id="page-info">แสดง 0 – 0 จาก 0 รายการ</span>
+              </div>
+              <div class="pages" id="pager"></div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /view-list -->
+
+      <div class="view-detail" id="view-detail">
+      <div class="view-main" id="view-main">
+
+      <div class="design-note">
+        💡 <strong>SPC Order Detail — Full Tab Mockup (6 tabs)</strong> · กดที่ tab ด้านบนเพื่อสลับดูได้ทุกแท็บ
+      </div>
+
+      <div class="card">
+
+        <!-- ===== Tabs Bar ===== -->
+        <div class="tabs-bar">
+          <div class="tab-group">
+            <button class="tab active" data-tab="order">Order Information</button>
+            <button class="tab" data-tab="status">Status Detail</button>
+            <button class="tab" data-tab="payment">Payment Detail</button>
+            <button class="tab" data-tab="promo-sku">Promotion by SKU</button>
+            <button class="tab" data-tab="promo-summary">Promotion Summary</button>
+            <button class="tab" data-tab="history">History Log</button>
+          </div>
+          <div class="updated">Last updated: <strong>31-10-2025 10:09</strong></div>
+        </div>
+
+        <!-- Global order header (shared across tabs) -->
+        <div class="order-header">
+          <div class="order-id" id="od-orderid"><span>Order ID:</span><span id="od-orderid-val">WP25120000000001</span></div>
+          <div class="order-divider"></div>
+          <div class="order-customer">
+            <span class="lbl">ลูกค้า</span>
+            <span class="name" id="od-custname">พรชนก สัมมาเลิศกัณท์</span>
+            <span class="vip-badge" title="VIP Member">VIP</span>
+            <span class="ico">·</span>
+            <a href="tel:0859050612" id="od-phone" class="field-action" style="font-size:13px;">📞 085-9050612</a>
+          </div>
+        </div>
+
+        <!-- ========== TAB: ORDER INFORMATION ========== -->
+        <div class="panel active" id="panel-order">
+
+          <!-- Reference meta strip (full width) -->
+          <div class="meta-strip">
+            <span class="meta-item">CDPID: <strong>2504000034</strong></span>
+            <span class="meta-item">ชื่อกิจการ: <strong>–</strong></span>
+            <span class="meta-item">Parent ID: <strong>–</strong></span>
+            <span class="meta-item">Flag Order: <span class="micro-chip">Normal Order</span></span>
+            <span class="meta-item">Order Reference: <strong>–</strong></span>
+            <span class="meta-item">Order Reference Status: <strong>–</strong></span>
+            <span class="meta-item">ใบเสร็จล้างมัดจำ: <strong>–</strong></span>
+          </div>
+
+          <!-- One unified 4-col info-grid for ALL fields (map sits in col 4 spanning rows 1-2) -->
+          <div class="info-section">
+            <div class="info-grid info-grid-with-map">
+              <!-- Row 1: 3 chip fields + map (map spans rows 1-2) -->
+              <div class="field">
+                <div class="field-label">Status</div>
+                <div class="field-value chip-only"><span class="status-chip"><span class="dot"></span>Out for Delivery</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label">Payment Status</div>
+                <div class="field-value chip-only"><span class="status-chip warning"><span class="dot"></span>Unpaid · COD</span></div>
+              </div>
+              <div class="field">
+                <div class="field-label">Customer Type</div>
+                <div class="field-value chip-only"><span class="status-chip" style="background:#FEF3C7; color:#92400E;"><span class="dot"></span>The1 Member</span></div>
+              </div>
+              <div class="delivery-map map-in-grid" title="แผนที่บ้านลูกค้า">
+                <div class="map-canvas">
+                  <div class="road r1"></div>
+                  <div class="road r2"></div>
+                  <div class="road r3"></div>
+                  <div class="pin">📍</div>
+                  <div class="pin-label">บ้านลูกค้า</div>
+                  <div class="map-attribution">Map data ©2026</div>
+                </div>
+                <div class="map-footer">
+                  <span>📍 ปทุมธานี · 12130</span>
+                  <a href="#" onclick="return false;">Google Maps ↗</a>
+                </div>
+              </div>
+
+              <!-- Row 2: 3 date/route fields (map continues in col 4) -->
+              <div class="field">
+                <div class="field-label">Shipment Date</div>
+                <div class="field-value">11/12/2025 08:00 - 12:00</div>
+              </div>
+              <div class="field">
+                <div class="field-label">Order Date</div>
+                <div class="field-value">10/12/2025 22:14</div>
+              </div>
+              <div class="field">
+                <div class="field-label">Delivery Route</div>
+                <div class="field-value">RS - รังสิต ปทุมธานี</div>
+              </div>
+
+              <!-- Row 3+: rest (full 4-col) -->
+              <div class="field">
+                <div class="field-label">Sale Channel</div>
+                <div class="field-value">CFW</div>
+              </div>
+              <div class="field">
+                <div class="field-label">Sale Source</div>
+                <div class="field-value">WA</div>
+              </div>
+              <div class="field">
+                <div class="field-label">Store</div>
+                <div class="field-value">007 - Rungsit</div>
+              </div>
+              <div class="field">
+                <div class="field-label">Tax Invoice No.</div>
+                <div class="field-value">TX-2025121000045</div>
+              </div>
+
+              <div class="field">
+                <div class="field-label">Customer Email</div>
+                <div class="field-value">prpornchanok@gmail.com</div>
+              </div>
+              <div class="field">
+                <div class="field-label">The1 Member ID</div>
+                <div class="field-value">T1-1832-4421-908</div>
+              </div>
+              <div class="field">
+                <div class="field-label">ผู้ติดต่อ/ผู้รับ · Contact</div>
+                <div class="field-value">Eddy home</div>
+              </div>
+              <div class="field">
+                <div class="field-label">เบอร์โทรผู้ติดต่อ</div>
+                <div class="field-value">087-542-7829 <a href="tel:0875427829" class="field-action">📞 Call</a></div>
+              </div>
+
+              <div class="field" style="grid-column: span 2;">
+                <div class="field-label">Delivery Address</div>
+                <div class="field-value">88/12 หมู่ 5 ถ.รังสิต-นครนายก ต.ประชาธิปัตย์ อ.ธัญบุรี จ.ปทุมธานี 12130</div>
+              </div>
+              <div class="field" style="grid-column: span 2;">
+                <div class="field-label">Delivery Method</div>
+                <div class="field-value">Delivery — สาขาส่งเอง (รถปกติ)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes (compact) -->
+          <div class="info-section" style="margin-bottom:10px;">
+            <div class="notes-box empty">
+              <span class="notes-icon">📝</span>
+              <span><strong style="color:#6B7280; margin-right:6px;">หมายเหตุ:</strong> ยังไม่มีหมายเหตุสำหรับออเดอร์นี้</span>
+            </div>
+          </div>
+
+          <!-- Order Items (at bottom — preferred layout) -->
+          <div class="info-section">
+            <div class="section-title">รายการสินค้า · Order Items <span style="font-size:12px; color:#6B7280; font-weight:500; margin-left:8px;">จำนวน 3 รายการ</span></div>
+            <div class="table-wrap" style="border-radius:8px;">
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th style="width:44px;">No.</th>
+                    <th style="width:110px;">เลขที่ใบเสร็จ</th>
+                    <th style="width:96px;">SKU</th>
+                    <th style="width:130px;">BARCODE</th>
+                    <th>ชื่อสินค้า</th>
+                    <th style="width:240px;">เบิกสินค้า</th>
+                    <th class="num" style="width:80px;">จำนวน</th>
+                    <th class="num" style="width:100px;">จัดเตรียมแล้ว</th>
+                    <th class="num" style="width:80px;">ส่งแล้ว</th>
+                    <th style="width:130px;">สถานะสินค้า</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>D26021121</td>
+                    <td><span style="font-family:'SF Mono',monospace; font-size:12px;">010005883</span></td>
+                    <td><span style="font-family:'SF Mono',monospace; font-size:12px;">2000100058831</span></td>
+                    <td><strong>ม้ามวัวแช่แข็ง</strong> <span style="color:#6B7280;">กก.ละ</span></td>
+                    <td style="font-size:12px; color:#4B5563;">Stock — SNR สาขาศรีนครินทร์ 1</td>
+                    <td class="num">13.750</td>
+                    <td class="num">10.000</td>
+                    <td class="num">0</td>
+                    <td><span class="status-chip" style="background:#FEF3C7; color:#92400E; font-size:10px;"><span class="dot" style="background:#FBBF24;"></span>กำลังจัดเตรียม</span></td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>D26021121</td>
+                    <td><span style="font-family:'SF Mono',monospace; font-size:12px;">010020083</span></td>
+                    <td><span style="font-family:'SF Mono',monospace; font-size:12px;">2000100200834</span></td>
+                    <td>
+                      <strong>มันหมูแผ่น</strong> <span style="color:#6B7280;">กก.ละ</span>
+                      <div style="font-size:11px; color:#92400E; margin-top:3px; padding:3px 8px; background:#FEF3C7; border-radius:4px; display:inline-block;">📝 หมายเหตุ: รบกวนหั่นเป็นชิ้นลูกเต๋า</div>
+                    </td>
+                    <td style="font-size:12px; color:#4B5563;">Stock — SNR สาขาศรีนครินทร์ 1</td>
+                    <td class="num">11.000</td>
+                    <td class="num">8.000</td>
+                    <td class="num">0</td>
+                    <td><span class="status-chip" style="background:#FEF3C7; color:#92400E; font-size:10px;"><span class="dot" style="background:#FBBF24;"></span>กำลังจัดเตรียม</span></td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>D26021121</td>
+                    <td><span style="font-family:'SF Mono',monospace; font-size:12px;">010001615</span></td>
+                    <td><span style="font-family:'SF Mono',monospace; font-size:12px;">2000100016152</span></td>
+                    <td>
+                      <strong>อมยิ้ม จูปาจุ๊ปส์ ฟรุต 11 กรัม X50 ชิ้น</strong>
+                      <div style="font-size:11px; color:#6B7280; margin-top:2px;">(ขนมและของหวานที่ร่วมรายการ ครบทุกๆ 200 บาท ลด 15 บาท)</div>
+                    </td>
+                    <td style="font-size:12px; color:#4B5563;">Stock — SNR สาขาศรีนครินทร์ 1</td>
+                    <td class="num">11.000</td>
+                    <td class="num">11.000</td>
+                    <td class="num">0</td>
+                    <td><span class="status-chip" style="background:#D1FAE5; color:#065F46; font-size:10px;"><span class="dot" style="background:#10B981;"></span>จัดเตรียมเสร็จ</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Totals strip -->
+            <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+              <div style="display:grid; grid-template-columns:auto auto; gap:4px 24px; font-size:13px; min-width:280px;">
+                <span style="color:#6B7280;">Subtotal</span>
+                <span style="text-align:right; color:#1E2D52; font-weight:600;">฿ 6,350.00</span>
+                <span style="color:#6B7280;">Promotion Discount</span>
+                <span style="text-align:right; color:#DC2626; font-weight:600;">−90.00</span>
+                <span style="color:#6B7280;">The1 Redeem + Voucher</span>
+                <span style="text-align:right; color:#DC2626; font-weight:600;">−200.00</span>
+                <span style="color:#6B7280;">Shipping Fee</span>
+                <span style="text-align:right; color:#1E2D52; font-weight:600;">+100.00</span>
+                <span style="color:#065F46; font-weight:700; padding-top:6px; border-top:1px solid #A7F3D0;">Grand Total</span>
+                <span style="text-align:right; color:#065F46; font-weight:800; font-size:16px; padding-top:6px; border-top:1px solid #A7F3D0;">฿ 6,160.00</span>
+              </div>
+            </div>
+            <div style="font-size:12px; color:#6B7280; margin-top:8px;">
+              💡 ดูรายละเอียดส่วนลด/โปรโมชั่นได้ที่ tab <strong style="color:#1E2D52;">Promotion Summary</strong> · ดูประวัติการจ่ายเงินที่ tab <strong style="color:#1E2D52;">Payment Detail</strong>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-secondary" onclick="backToList()">← Back</button>
+            <button class="btn btn-warning" onclick="showPostpone()">⏸️ Postpone · เลื่อนจัดส่ง</button>
+            <button class="btn btn-danger" onclick="openCancelModal()">✕ Cancel · ยกเลิกออเดอร์</button>
+            <button class="btn btn-primary" onclick="openEditOrderModal()">✏️ Edit Order</button>
+            <button class="btn btn-secondary">🖨️ Print Invoice</button>
+          </div>
+        </div>
+
+        <!-- ========== TAB: STATUS DETAIL ========== -->
+        <div class="panel" id="panel-status">
+          <div class="summary-row">
+            <div class="summary-cell">
+              <div class="label">Current Status</div>
+              <div class="status-chip"><span class="dot"></span>Out for Delivery</div>
+            </div>
+            <div class="summary-cell">
+              <div class="label">Customer</div>
+              <div class="value">พรชนก สัมมาเลิศกัณท์</div>
+            </div>
+            <div class="summary-cell">
+              <div class="label">Delivery Route</div>
+              <div class="value">RS - รังสิต ปทุมธานี</div>
+            </div>
+            <div class="summary-cell">
+              <div class="label">Estimated Arrival</div>
+              <div class="value">11/12/2025 08:00 - 12:00</div>
+            </div>
+          </div>
+
+          <div class="timeline-section">
+            <div class="section-title">ไทม์ไลน์สถานะออเดอร์ · Order Status Timeline</div>
+            <div class="timeline">
+              <div class="step done">
+                <div class="step-icon">📋</div>
+                <div class="step-body">
+                  <div class="step-title">รายการสร้างเข้ามา · Order Created <span class="badge done">Completed</span></div>
+                  <div class="step-sub">ลูกค้าสร้างคำสั่งซื้อผ่านช่องทาง CFW</div>
+                  <div class="step-meta">
+                    <span class="meta-item">👤 <strong>พรชนก สัมมาเลิศกัณท์</strong></span>
+                    <span class="meta-item">📞 085-9050612</span>
+                    <span class="meta-item">📧 prpornchanok@gmail.com</span>
+                  </div>
+                </div>
+                <div class="step-time">10/12/2025<br>22:14</div>
+              </div>
+              <div class="step done">
+                <div class="step-icon">📦</div>
+                <div class="step-body">
+                  <div class="step-title">เริ่มจัดเตรียมสินค้า · Preparing <span class="badge done">Completed</span></div>
+                  <div class="step-sub">ทีมคลังเริ่มจัดเตรียมสินค้าตามรายการ</div>
+                  <div class="step-meta">
+                    <span class="meta-item">🏪 Store: <strong>007 - Rungsit</strong></span>
+                    <span class="meta-item">👷 Picker: <strong>Somchai T.</strong></span>
+                    <span class="meta-item">📦 1 SKU · 1 kg</span>
+                  </div>
+                </div>
+                <div class="step-time">10/12/2025<br>23:05</div>
+              </div>
+              <div class="step done">
+                <div class="step-icon">✅</div>
+                <div class="step-body">
+                  <div class="step-title">จัดเตรียมสินค้าเสร็จ · Ready to Ship <span class="badge done">Completed</span></div>
+                  <div class="step-sub">สินค้าบรรจุครบและเตรียมส่งมอบให้ขนส่ง</div>
+                </div>
+                <div class="step-time">11/12/2025<br>06:30</div>
+              </div>
+              <div class="step done">
+                <div class="step-icon">🚚</div>
+                <div class="step-body">
+                  <div class="step-title">ขนส่งเข้ารับสินค้า · Carrier Pickup <span class="badge done">Completed</span></div>
+                  <div class="step-sub">คนขับจากบริษัทขนส่งเข้ารับสินค้าที่คลัง</div>
+                  <div class="step-meta">
+                    <span class="meta-item">🚗 Driver: <strong>วิชัย ก.</strong></span>
+                    <span class="meta-item">📞 081-234-5678</span>
+                    <span class="meta-item">🛻 Vehicle: <strong>กข-1234</strong></span>
+                  </div>
+                </div>
+                <div class="step-time">11/12/2025<br>07:45</div>
+              </div>
+              <div class="step current">
+                <div class="step-icon">🛣️</div>
+                <div class="step-body">
+                  <div class="step-title">กำลังจัดส่ง · Out for Delivery <span class="badge current">In Progress</span></div>
+                  <div class="step-sub">รถออกจากคลัง กำลังเดินทางไปยังที่อยู่ลูกค้า</div>
+                  <div class="step-meta">
+                    <span class="meta-item">🛣️ Route: <strong>RS - รังสิต ปทุมธานี</strong></span>
+                    <span class="meta-item">⏱️ ETA: <strong>11/12/2025 08:00–12:00</strong></span>
+                    <span class="meta-item">📍 <a href="#" style="color:#1E2D52; font-weight:600;">ติดตามรถสด</a></span>
+                  </div>
+                </div>
+                <div class="step-time">11/12/2025<br>08:00</div>
+              </div>
+              <div class="step pending">
+                <div class="step-icon">🎉</div>
+                <div class="step-body">
+                  <div class="step-title">จัดส่งสำเร็จ · Delivered <span class="badge pending">Pending</span></div>
+                  <div class="step-sub">รอลูกค้ารับสินค้าและยืนยันการรับ</div>
+                </div>
+                <div class="step-time">รอดำเนินการ</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-secondary" onclick="backToList()">← Back</button>
+          </div>
+        </div>
+
+        <!-- ========== TAB: PAYMENT DETAIL ========== -->
+        <div class="panel" id="panel-payment">
+          <div class="section-title">สรุปการชำระเงิน · Payment Summary</div>
+
+          <div class="payment-summary">
+            <div class="pay-card">
+              <div class="label">Total Order Amount</div>
+              <div class="amount">฿ 6,160.00</div>
+              <div class="sub">รวมส่วนลด, โปรโมชั่น และค่าจัดส่ง</div>
+            </div>
+            <div class="pay-card success">
+              <div class="label">Paid Amount</div>
+              <div class="amount">฿ 4,160.00</div>
+              <div class="sub">ชำระแล้ว 2 รายการ</div>
+            </div>
+            <div class="pay-card highlight">
+              <div class="label">Outstanding Balance</div>
+              <div class="amount">฿ 2,000.00</div>
+              <div class="sub">ค้างชำระ · กำหนดชำระภายใน 11/12/2025</div>
+            </div>
+          </div>
+
+          <div class="pay-method-summary">
+            <span class="pay-method-chip"><span class="m-icon m-t1cb">T1</span>T1CB <span class="m-amt">฿ 2,500.00</span></span>
+            <span class="pay-method-chip"><span class="m-icon m-kbnk">KB</span>KBNK <span class="m-amt">฿ 1,660.00</span></span>
+            <span class="pay-method-chip" style="opacity:.5;"><span class="m-icon m-cod">💵</span>COD เก็บเงินปลายทาง <span class="m-amt">฿ 2,000.00</span></span>
+          </div>
+
+          <div class="table-wrap">
+            <div class="table-header">
+              <h3>ประวัติการชำระเงิน · Payment History</h3>
+              <button class="btn btn-success btn-small">+ Add Payment</button>
+            </div>
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Date / Time</th>
+                  <th>Method</th>
+                  <th>Reference</th>
+                  <th>Status</th>
+                  <th class="num">Amount</th>
+                  <th>Receipt</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>10/12/2025 22:20</td>
+                  <td><span class="method-pill"><span class="m-mini m-t1cb">T1</span>T1CB</span></td>
+                  <td>TXN-T1-25121022014857</td>
+                  <td><span class="status-chip success"><span class="dot"></span>Success</span></td>
+                  <td class="num"><strong>฿ 2,500.00</strong></td>
+                  <td><a href="#" style="color:#1E2D52; font-weight:600;">📄 View</a></td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>11/12/2025 06:48</td>
+                  <td><span class="method-pill"><span class="m-mini m-kbnk">KB</span>KBNK</span></td>
+                  <td>TXN-KB-25121106482104</td>
+                  <td><span class="status-chip success"><span class="dot"></span>Success</span></td>
+                  <td class="num"><strong>฿ 1,660.00</strong></td>
+                  <td><a href="#" style="color:#1E2D52; font-weight:600;">📄 View</a></td>
+                </tr>
+                <tr style="opacity:0.85;">
+                  <td>3</td>
+                  <td style="color:#9CA3AF;">รอชำระปลายทาง</td>
+                  <td><span class="method-pill"><span class="m-mini m-cod">฿</span>COD เก็บเงินปลายทาง</span></td>
+                  <td style="color:#9CA3AF;">รอจัดส่ง — เก็บเงินเมื่อรับสินค้า</td>
+                  <td><span class="status-chip warning"><span class="dot"></span>Pending COD</span></td>
+                  <td class="num" style="color:#92400E;"><strong>฿ 2,000.00</strong></td>
+                  <td style="color:#9CA3AF; font-size:12px;">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+            <div class="pay-card">
+              <div class="label">Customer Info</div>
+              <div style="margin-top:8px; font-size:13px; color:#1E2D52;">
+                <div><strong>พรชนก สัมมาเลิศกัณท์</strong></div>
+                <div style="color:#6B7280; margin-top:2px;">📞 085-9050612 · 📧 prpornchanok@gmail.com</div>
+              </div>
+            </div>
+            <div class="pay-card">
+              <div class="label">Billing Address</div>
+              <div style="margin-top:8px; font-size:13px; color:#4B5563;">
+                007 - Rungsit, ปทุมธานี<br>
+                Tax Invoice No.: <strong style="color:#1E2D52;">TX-2025121000045</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-secondary" onclick="backToList()">← Back</button>
+          </div>
+        </div>
+
+        <!-- ========== TAB: PROMOTION BY SKU ========== -->
+        <div class="panel" id="panel-promo-sku">
+          <div class="section-title">โปรโมชั่นรายสินค้า · Promotion by SKU</div>
+
+          <div class="promo-table-wrap">
+            <table class="promo-sku">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th class="no-sort"></th>
+                  <th>SKU</th>
+                  <th>Barcode</th>
+                  <th>สินค้า</th>
+                  <th class="num">ราคาต่อหน่วย</th>
+                  <th class="num">จำนวนคำสั่งซื้อ</th>
+                  <th class="group-blue num">จำนวนที่จัดแล้ว</th>
+                  <th class="group-blue num">จำนวนที่ขาด/เกิน</th>
+                  <th class="group-blue num">ยอดที่ขาด/เกิน</th>
+                  <th class="group-green num">จำนวนที่จัดส่ง</th>
+                  <th class="group-green num">ยอดที่ขาด</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td><div class="product-thumb">🥩</div></td>
+                  <td>010005883</td>
+                  <td>2000100058831</td>
+                  <td>
+                    <div class="product-name">ม้ามวัวแช่แข็ง กก.ละ</div>
+                    <div class="promo-line red">ลด 100 บาท เมื่อซื้อสินค้าแช่แข็งที่ร่วมรายการ ครบทุกๆ 3,000 บาท <span class="badge invalid">Invalid</span></div><br>
+                    <div class="promo-line blue">รับ The1 Stamp ยอดซื้อทุกๆ 1,500 บาท รับ 1 ดวง</div><br>
+                    <div class="promo-line remark">(เลขที่ใบเสร็จ D26021121)</div>
+                  </td>
+                  <td class="num">199.00</td>
+                  <td class="num">13.750</td>
+                  <td class="num col-blue">10.000</td>
+                  <td class="num col-blue negative">-3.750</td>
+                  <td class="num col-blue negative">-746.25</td>
+                  <td class="num col-green">0</td>
+                  <td class="num col-green">0</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td><div class="product-thumb">🥓</div></td>
+                  <td>010020083</td>
+                  <td>2000100200834</td>
+                  <td>
+                    <div class="product-name">มันหมูแผ่น กก.ละ</div>
+                    <div class="promo-line green">ซื้อของสดครบ 200 บาท ลด 20 บาท <span class="badge extra">Extra</span></div><br>
+                    <div class="promo-line remark">(เลขที่ใบเสร็จ D26021121)</div>
+                  </td>
+                  <td class="num">189.00</td>
+                  <td class="num">11.000</td>
+                  <td class="num col-blue">8.000</td>
+                  <td class="num col-blue negative">-3.000</td>
+                  <td class="num col-blue negative">-567.00</td>
+                  <td class="num col-green">0</td>
+                  <td class="num col-green">0</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td><div class="product-thumb">🍬</div></td>
+                  <td>010001615</td>
+                  <td>2000100016152</td>
+                  <td>
+                    <div class="product-name">อมยิ้ม จูปาจุ๊ปส์ ฟรุต 11 กรัม X50 ชิ้น</div>
+                    <div class="promo-line blue">ขนมและของหวานที่ร่วมรายการ ครบทุกๆ 200 บาท ลด 15 บาท</div><br>
+                    <div class="promo-line remark">(เลขที่ใบเสร็จ D26021121)</div>
+                  </td>
+                  <td class="num">135.00</td>
+                  <td class="num">11.000</td>
+                  <td class="num col-blue">11.000</td>
+                  <td class="num col-blue">0</td>
+                  <td class="num col-blue">0</td>
+                  <td class="num col-green">0</td>
+                  <td class="num col-green">0</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="display:flex; gap:16px; margin-top:16px; font-size:11px; color:#6B7280;">
+            <span><span style="display:inline-block; width:14px; height:14px; background:#EFF6FF; border:1px solid #DBEAFE; border-radius:3px; vertical-align:middle; margin-right:6px;"></span>คอลัมน์การจัดเตรียม (Picking)</span>
+            <span><span style="display:inline-block; width:14px; height:14px; background:#F0FDF4; border:1px solid #D1FAE5; border-radius:3px; vertical-align:middle; margin-right:6px;"></span>คอลัมน์การจัดส่ง (Shipping)</span>
+            <span><span class="badge invalid">Invalid</span> ไม่ผ่านเงื่อนไขโปร</span>
+            <span><span class="badge extra">Extra</span> ส่วนลดเพิ่มเติม</span>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-secondary" onclick="backToList()">← Back</button>
+          </div>
+        </div>
+
+        <!-- ========== TAB: PROMOTION SUMMARY ========== -->
+        <div class="panel" id="panel-promo-summary">
+          <div class="section-title">สรุปโปรโมชั่น · Promotion Summary</div>
+
+          <div class="summary-grid">
+
+            <!-- ===== Card 1: Privilege ===== -->
+            <div class="summary-card card-privilege">
+              <h4>สิทธิ์แลกซื้อ / ของแถม</h4>
+              <div class="privilege-item">
+                <span class="pnum">1</span>
+                <span>รับ GO Stamp 3 ชิ้น : iversary ยอดซื้อทุกๆ 1,500 บาท รับ GO Stamp 1 ดวง V1</span>
+              </div>
+              <div class="privilege-item">
+                <span class="pnum">2</span>
+                <span>รับ PM_ผ้ากันเปื้อน X1ซ 2 ชิ้น : มี UHT สูตร 4 ครบ 1,500 บาท รับ PM_ผ้ากันเปื้อน 2 ชิ้น จำกัด 1 สิทธิ์</span>
+              </div>
+              <div class="privilege-item invalid">
+                <span class="pnum">3</span>
+                <span>ซื้อครบ 3,000 รับฟรีถุงผ้า GO 1 ใบ / ใบเสร็จ หมดแล้วหมดเลย <span class="badge invalid">Invalid</span></span>
+              </div>
+              <div class="privilege-item valid">
+                <span class="pnum">4</span>
+                <span>ซื้อครบ 3,500 รับฟรีบ้านกำลัง GO 1 หลัง / ใบเสร็จ หมดแล้วหมดเลย <span class="badge extra">Extra</span></span>
+              </div>
+            </div>
+
+            <!-- ===== Card 2: Discounts ===== -->
+            <div class="summary-card card-discount">
+              <h4>ส่วนลด</h4>
+              <div class="discount-header">
+                <span></span>
+                <span style="text-align:right;">Original QTY</span>
+                <span style="text-align:right;">Original Amt</span>
+                <span style="text-align:right;">After Amt</span>
+                <span></span>
+              </div>
+
+              <div class="discount-row">
+                <div class="d-desc">
+                  <strong>1.</strong> ลด 100 บาท เมื่อซื้อแบรนด์ A-CHOICE ที่ร่วมรายการ ครบทุกๆ 3,000
+                  <span class="badge invalid">Invalid</span>
+                </div>
+                <div class="d-num"></div>
+                <div class="d-num"><strong>100.00</strong></div>
+                <div class="d-num">0</div>
+                <button class="d-btn">−</button>
+              </div>
+              <div class="discount-sub">
+                <div style="display:grid; grid-template-columns:1fr 80px 100px 80px 30px; gap:8px; padding:4px 0;">
+                  <span><span class="item-sku">010005883</span> ม้ามวัวแช่แข็ง กก.ละ</span>
+                  <span style="text-align:right;">13.750</span>
+                  <span style="text-align:right;">66.66</span>
+                  <span style="text-align:right;">0</span>
+                  <span></span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 80px 100px 80px 30px; gap:8px; padding:4px 0;">
+                  <span><span class="item-sku">010020083</span> มันหมูแผ่น กก.ละ</span>
+                  <span style="text-align:right;">11.000</span>
+                  <span style="text-align:right;">33.33</span>
+                  <span style="text-align:right;">0</span>
+                  <span></span>
+                </div>
+              </div>
+
+              <div class="discount-row">
+                <div class="d-desc">
+                  <strong>2.</strong> ลดสังละ 3/4/5/6 บาท เมื่อซื้อ โอชิชิ 350 มล. ครบ 3/6/12/24 ลังขึ้นไป
+                  <span class="badge invalid">Invalid</span>
+                </div>
+                <div class="d-num"></div>
+                <div class="d-num"><strong>60.00</strong></div>
+                <div class="d-num">0</div>
+                <button class="d-btn">−</button>
+              </div>
+              <div class="discount-sub">
+                <div style="display:grid; grid-template-columns:1fr 80px 100px 80px 30px; gap:8px; padding:4px 0;">
+                  <span><span class="item-sku">010001615</span> อมยิ้ม จูปาจุ๊ปส์ ฟรุต 11 กรัม X50 ชิ้น</span>
+                  <span style="text-align:right;">11.000</span>
+                  <span style="text-align:right;">60.00</span>
+                  <span style="text-align:right;">0</span>
+                  <span></span>
+                </div>
+              </div>
+
+              <div class="discount-row">
+                <div class="d-desc">
+                  <strong>3.</strong> ซื้อ น้ำสตรอเบอร์รี่เข้มข้น สูตร2 ตราต่งฟง ที่ร่วมรายการ 1 ลัง แถม 1 ลัง
+                  <span class="badge invalid">Invalid</span>
+                </div>
+                <div class="d-num"></div>
+                <div class="d-num"><strong>150.00</strong></div>
+                <div class="d-num">0</div>
+                <button class="d-btn" style="background:#D1FAE5; color:#065F46;">+</button>
+              </div>
+
+              <div class="discount-row">
+                <div class="d-desc">
+                  <strong>4.</strong> STEA1 ลด 10/20 บ. เมื่อซื้อ มันฝรั่งทอดกรอบคลาสสิค รสมับฝรั่งแก้ เลย ครบ 300/500บ.
+                </div>
+                <div class="d-num"></div>
+                <div class="d-num"><strong>40.00</strong></div>
+                <div class="d-num"><strong>4.00</strong></div>
+                <button class="d-btn" style="background:#D1FAE5; color:#065F46;">+</button>
+              </div>
+
+              <div class="discount-row" style="border-bottom:none;">
+                <div class="d-desc">
+                  <strong>5.</strong> Accumulate Purchased6_ALL_100 THB get 50 THB Coupon
+                </div>
+                <div class="d-num"></div>
+                <div class="d-num"><strong>50.00</strong></div>
+                <div class="d-num"><strong>50.00</strong></div>
+                <button class="d-btn" style="background:#D1FAE5; color:#065F46;">+</button>
+              </div>
+            </div>
+
+            <!-- ===== Card 3: Summary Totals ===== -->
+            <div class="summary-card card-totals">
+              <h4>สรุปยอด</h4>
+              <div class="total-row">
+                <span>ยอดชำระเงินตั้งต้น</span>
+                <strong>6,500.00</strong>
+              </div>
+              <div class="total-row warning">
+                <span>รวมยอดที่ขาด</span>
+                <strong>-100.00</strong>
+              </div>
+              <div class="total-row success">
+                <span>รวมยอดที่เกิน</span>
+                <strong>+50.00</strong>
+              </div>
+              <div class="total-divider"></div>
+              <div class="total-row">
+                <span>มูลค่าสินค้าก่อนส่วนลด</span>
+                <strong>6,450.00</strong>
+              </div>
+              <div class="total-divider"></div>
+
+              <div class="total-split">
+                <div class="ts-col">
+                  <h5>ส่วนลดตั้งต้น</h5>
+                  <div class="ts-row"><span>สินค้า</span><strong>-350.00</strong></div>
+                  <div class="ts-row"><span>คูปอง</span><strong>-50.00</strong></div>
+                  <div class="ts-row" style="border-top:1px dashed #E5E7EB; padding-top:6px; margin-top:4px;"><span style="color:#991B1B; font-weight:700;">รวม</span><strong style="color:#991B1B;">-500.00</strong></div>
+                </div>
+                <div class="ts-col">
+                  <h5>ส่วนลดปัจจุบัน</h5>
+                  <div class="ts-row"><span>สินค้า</span><strong>-40.00</strong></div>
+                  <div class="ts-row"><span>คูปอง</span><strong>-50.00</strong></div>
+                  <div class="ts-row" style="border-top:1px dashed #E5E7EB; padding-top:6px; margin-top:4px;"><span style="color:#065F46; font-weight:700;">รวม</span><strong style="color:#065F46;">-90.00</strong></div>
+                </div>
+              </div>
+
+              <div class="total-divider"></div>
+              <div class="total-row"><span>The1 Redeem Point</span><strong>-100.00</strong></div>
+              <div class="total-row"><span>Voucher</span><strong>-100.00</strong></div>
+              <div class="total-row"><span>ค่าส่ง</span><strong>+100.00</strong></div>
+
+              <div class="grand-total">
+                <span class="gt-label">รวมยอดที่ต้องชำระ</span>
+                <span class="gt-value">฿ 6,160.00</span>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-secondary" onclick="backToList()">← Back</button>
+          </div>
+        </div>
+
+        <!-- ========== TAB: HISTORY LOG ========== -->
+        <div class="panel" id="panel-history">
+          <div class="section-title">ประวัติการแก้ไข · History Log</div>
+
+          <!-- Filter chips -->
+          <div class="history-filter">
+            <span class="h-chip active">ทั้งหมด · All (4)</span>
+            <span class="h-chip">📝 แก้ไขข้อมูล (1)</span>
+            <span class="h-chip">🔄 เปลี่ยนสถานะ (2)</span>
+            <span class="h-chip">✨ สร้างออเดอร์ (1)</span>
+          </div>
+
+          <!-- Log entries (เรียงล่าสุดบนสุด) -->
+          <div class="history-list">
+
+            <!-- Entry 1: Status change -->
+            <div class="history-entry">
+              <div class="h-time">
+                <span class="h-date">11/12/2025</span>
+                <span>09:42</span>
+              </div>
+              <div class="h-icon-col">
+                <div class="h-icon status">🚚</div>
+              </div>
+              <div class="h-body">
+                <div class="h-action-line">
+                  <span class="h-user">staff.cfw01</span>
+                  <span class="h-verb">เปลี่ยนสถานะออเดอร์เป็น</span>
+                  <span class="h-field">Out for Delivery</span>
+                  <span class="h-tag status" style="margin-left:6px;">Status</span>
+                </div>
+                <div class="h-detail-row">
+                  <span class="h-diff">
+                    <span class="h-before">Ready to Ship</span>
+                    <span class="h-arrow">→</span>
+                    <span class="h-after">Out for Delivery</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Entry 2: Delivery Method changed -->
+            <div class="history-entry">
+              <div class="h-time">
+                <span class="h-date">11/12/2025</span>
+                <span>07:15</span>
+              </div>
+              <div class="h-icon-col">
+                <div class="h-icon edit">🚛</div>
+              </div>
+              <div class="h-body">
+                <div class="h-action-line">
+                  <span class="h-user">Admin@central.co.th</span>
+                  <span class="h-verb">แก้ไขข้อมูล</span>
+                  <span class="h-field">Delivery Method</span>
+                  <span class="h-tag edit" style="margin-left:6px;">Edit</span>
+                </div>
+                <div class="h-detail-row">
+                  <span class="h-diff">
+                    <span class="h-before">Pickup — มารับสินค้าที่สาขา</span>
+                    <span class="h-arrow">→</span>
+                    <span class="h-after">Delivery — สาขาส่งเอง (รถปกติ)</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Entry 4: Status change to Preparing -->
+            <div class="history-entry">
+              <div class="h-time">
+                <span class="h-date">10/12/2025</span>
+                <span>22:50</span>
+              </div>
+              <div class="h-icon-col">
+                <div class="h-icon status">📦</div>
+              </div>
+              <div class="h-body">
+                <div class="h-action-line">
+                  <span class="h-user">staff.cfw01</span>
+                  <span class="h-verb">เปลี่ยนสถานะออเดอร์เป็น</span>
+                  <span class="h-field">Preparing</span>
+                  <span class="h-tag status" style="margin-left:6px;">Status</span>
+                </div>
+                <div class="h-detail-row">
+                  <span class="h-diff">
+                    <span class="h-before">Order Created</span>
+                    <span class="h-arrow">→</span>
+                    <span class="h-after">Preparing</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Entry 4: Order created -->
+            <div class="history-entry">
+              <div class="h-time">
+                <span class="h-date">10/12/2025</span>
+                <span>22:14</span>
+              </div>
+              <div class="h-icon-col">
+                <div class="h-icon create">✨</div>
+              </div>
+              <div class="h-body">
+                <div class="h-action-line">
+                  <span class="h-user">พรชนก สัมมาเลิศกัณท์</span>
+                  <span class="h-verb">สร้างคำสั่งซื้อใหม่ผ่านช่องทาง</span>
+                  <span class="h-field">CFW · WA</span>
+                  <span class="h-tag create" style="margin-left:6px;">Create</span>
+                </div>
+                <div class="h-detail-row">
+                  <span style="font-size:12px; color:#6B7280;">
+                    Order ID: <strong style="color:#1E2D52;">WP25120000000001</strong> · จำนวนสินค้า 3 รายการ · ยอด ฿ 6,160.00 (COD)
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-secondary" onclick="backToList()">← Back</button>
+          </div>
+        </div>
+
+      </div>
+
+      </div><!-- /view-main -->
+
+      <!-- ============ VIEW: POSTPONE WIZARD ============ -->
+      <div class="view-postpone" id="view-postpone">
+        <div class="pp-card">
+          <div class="pp-header">
+            <h2>⏸️ เลื่อนการจัดส่ง · Postpone Delivery</h2>
+            <button class="pp-back-btn" onclick="hidePostpone()">← กลับสู่ Order Detail</button>
+          </div>
+
+          <!-- Stepper -->
+          <div class="pp-stepper">
+            <div class="pp-step active" id="step-indicator-1"><span class="pp-num">1</span><span>ระบุรายละเอียด</span></div>
+            <div class="pp-dash" id="dash-1"></div>
+            <div class="pp-step" id="step-indicator-2"><span class="pp-num">2</span><span>เลือกวัน & Slot</span></div>
+            <div class="pp-dash" id="dash-2"></div>
+            <div class="pp-step" id="step-indicator-3"><span class="pp-num">3</span><span>ยืนยัน</span></div>
+          </div>
+
+          <div class="pp-body">
+
+            <!-- ===== Step 1: Form ===== -->
+            <div class="pp-step-content active" id="pp-step-1">
+              <div class="pp-section-title">ขั้นตอนที่ 1 — ระบุรายละเอียดการเลื่อนจัดส่ง</div>
+
+              <div class="pp-grid">
+                <!-- Flag: Re-pick stock at WMS? (top of form) -->
+                <div class="form-field col-full">
+                  <label style="display:flex; align-items:center; gap:10px; padding:14px 16px; background:#FEF3C7; border:1px solid #FCD34D; border-radius:8px; cursor:pointer; user-select:none; font-size:13px; color:#78350F; font-weight:600;">
+                    <input type="checkbox" id="pp-wms-repick" style="width:18px; height:18px; accent-color:#1E2D52; cursor:pointer; flex-shrink:0;">
+                    <span>
+                      📦 <strong>การเลื่อนครั้งนี้ต้องการเบิกสินค้าที่ WMS ใหม่</strong>
+                      <span style="display:block; font-size:11px; color:#92400E; font-weight:500; margin-top:3px;">ติ๊กถูก = ส่งคำสั่งเบิกสินค้าใหม่ที่ WMS · ไม่ติ๊ก = ใช้สินค้าที่เบิกไว้แล้ว</span>
+                    </span>
+                  </label>
+                </div>
+
+                <!-- Editable: Reason + Note (full width) -->
+                <div class="form-field col-full">
+                  <label>ประเภทการขอเลื่อน <span class="req">*</span></label>
+                  <select class="select" id="pp-reason">
+                    <option value="">กรุณาเลือก</option>
+                    <option>ลูกค้าขอเลื่อน · Customer requested</option>
+                    <option>ไม่สะดวกรับสินค้า · Not available to receive</option>
+                    <option>เปลี่ยนแปลงที่อยู่ · Address change</option>
+                    <option>สินค้าไม่พร้อม · Item not ready</option>
+                    <option>เหตุสุดวิสัย · Force majeure</option>
+                    <option>อื่นๆ · Other</option>
+                  </select>
+                </div>
+                <div class="form-field col-full">
+                  <label>หมายเหตุการขอเลื่อน <span class="req">*</span></label>
+                  <textarea id="pp-note" placeholder="ระบุรายละเอียดเพิ่มเติม..."></textarea>
+                </div>
+
+                <!-- Readonly: receiver info -->
+                <div class="pp-readonly-field col-full">
+                  <label>ที่อยู่ผู้รับสินค้า <span class="req">*</span></label>
+                  <div class="value-box with-action">
+                    <span>88/12 หมู่ 5 ถ.รังสิต-นครนายก ต.ประชาธิปัตย์ อ.ธัญบุรี จ.ปทุมธานี 12130</span>
+                    <span class="lock">🔒 readonly</span>
+                  </div>
+                </div>
+                <div class="pp-readonly-field">
+                  <label>ชื่อ-นามสกุลผู้รับสินค้า <span class="req">*</span></label>
+                  <div class="value-box">พรชนก สัมมาเลิศกัณท์</div>
+                </div>
+                <div class="pp-readonly-field">
+                  <label>เบอร์ติดต่อ <span class="req">*</span></label>
+                  <div class="value-box">085-9050612</div>
+                </div>
+                <div class="pp-readonly-field">
+                  <label>ละติจูด <span class="req">*</span></label>
+                  <div class="value-box">14.0312691</div>
+                </div>
+                <div class="pp-readonly-field">
+                  <label>ลองจิจูด <span class="req">*</span></label>
+                  <div class="value-box">100.6173324</div>
+                </div>
+
+                <!-- Map readonly -->
+                <div class="pp-map-readonly">
+                  <div class="road r1"></div>
+                  <div class="road r2"></div>
+                  <div class="pin">📍</div>
+                  <div style="position:absolute; top:calc(50% + 12px); left:55%; transform:translateX(-50%); background:#FFFFFF; border:1px solid #E5E7EB; border-radius:4px; padding:2px 8px; font-size:11px; color:#1E2D52; font-weight:600;">บ้านลูกค้า</div>
+                  <div style="position:absolute; bottom:6px; right:8px; font-size:10px; color:#6B7280; background:rgba(255,255,255,0.7); padding:1px 4px; border-radius:2px;">Map data ©2026 · Leaflet</div>
+                </div>
+
+                <!-- Sale Source (replaces "สินค้า") -->
+                <div class="pp-readonly-field col-full">
+                  <label>Sale Source <span class="req">*</span></label>
+                  <div class="value-box">WA — WhatsApp Order</div>
+                </div>
+
+                <div class="form-field" style="display:flex; flex-direction:column; gap:4px;">
+                  <label style="font-size:12px; font-weight:600; color:#1E2D52;">ประเภทการจัดส่ง <span class="req">*</span> <small style="font-weight:400; color:#10B981;">🔓 editable</small></label>
+                  <select class="select" id="pp-delivery-type" style="font-size:13px; color:#1E2D52; padding:9px 12px; background:#FFFFFF; border:1px solid #D1D5DB; border-radius:6px; outline:none; font-family:inherit; appearance:none; background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236B7280' d='M6 8L0 0h12z'/%3E%3C/svg%3E&quot;); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px;">
+                    <option>NORMAL — Delivery สาขาส่งเอง (รถปกติ)</option>
+                    <option>NORMAL — Delivery สาขาส่งเอง (รถเย็น)</option>
+                    <option>EXPRESS — ส่งด่วน Same Day</option>
+                    <option>3PL — Third Party (Lalamove)</option>
+                    <option>3PL — Third Party (Kerry)</option>
+                    <option>PICKUP — ลูกค้ามารับสินค้าที่สาขา</option>
+                  </select>
+                </div>
+                <div class="pp-readonly-field">
+                  <label>ประเภทบริการ <span class="req">*</span></label>
+                  <div class="value-box">WAS — ส่งสินค้า</div>
+                </div>
+                <div class="pp-readonly-field">
+                  <label>สาขาผู้ส่ง <span class="req">*</span></label>
+                  <div class="value-box">SNR — สาขา ศรีนครินทร์ 1</div>
+                </div>
+                <div class="pp-readonly-field">
+                  <label>ต้นทางสินค้า</label>
+                  <div class="value-box">PL20214 — D2 คลังสินค้ารอง</div>
+                </div>
+                <div class="pp-readonly-field col-full">
+                  <label>ระบุโซนจัดส่ง <span class="req">*</span></label>
+                  <div class="value-box">✓ DC-07 ปทุมธานี</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== Step 2: Calendar ===== -->
+            <div class="pp-step-content" id="pp-step-2">
+              <div class="pp-section-title">ขั้นตอนที่ 2 — เลือกวันและ Slot ที่ว่าง</div>
+
+              <div class="cal-toolbar">
+                <button class="cal-today-btn">↻ ไปที่วันนี้</button>
+                <div class="cal-title">พฤษภาคม 2026 · May 2026</div>
+                <div class="cal-nav">
+                  <button title="เดือนก่อน">‹</button>
+                  <button title="เดือนถัดไป">›</button>
+                </div>
+              </div>
+
+              <div class="calendar">
+                <div class="calendar-head">
+                  <div class="ch">Monday</div>
+                  <div class="ch">Tuesday</div>
+                  <div class="ch">Wednesday</div>
+                  <div class="ch">Thursday</div>
+                  <div class="ch">Friday</div>
+                  <div class="ch">Saturday</div>
+                  <div class="ch">Sunday</div>
+                </div>
+
+                <!-- Week 1: Apr 27-30 + May 1-3 -->
+                <div class="calendar-row">
+                  <div class="cell muted"><div class="day-num">27</div></div>
+                  <div class="cell muted"><div class="day-num">28</div></div>
+                  <div class="cell muted"><div class="day-num">29</div></div>
+                  <div class="cell muted"><div class="day-num">30</div></div>
+                  <div class="cell muted"><div class="day-num">1</div></div>
+                  <div class="cell muted weekend"><div class="day-num">2</div></div>
+                  <div class="cell muted weekend"><div class="day-num">3</div></div>
+                </div>
+
+                <!-- Week 2: May 4-10 -->
+                <div class="calendar-row">
+                  <div class="cell muted"><div class="day-num">4</div></div>
+                  <div class="cell muted"><div class="day-num">5</div></div>
+                  <div class="cell muted"><div class="day-num">6</div></div>
+                  <div class="cell muted"><div class="day-num">7</div></div>
+                  <div class="cell muted"><div class="day-num">8</div></div>
+                  <div class="cell muted weekend"><div class="day-num">9</div></div>
+                  <div class="cell muted weekend"><div class="day-num">10</div></div>
+                </div>
+
+                <!-- Week 3: May 11-17 -->
+                <div class="calendar-row">
+                  <div class="cell muted"><div class="day-num">11</div></div>
+                  <div class="cell muted"><div class="day-num">12</div></div>
+                  <div class="cell muted"><div class="day-num">13</div></div>
+                  <div class="cell muted"><div class="day-num">14</div></div>
+                  <div class="cell muted"><div class="day-num">15</div></div>
+                  <div class="cell muted weekend"><div class="day-num">16</div></div>
+                  <div class="cell muted weekend"><div class="day-num">17</div></div>
+                </div>
+
+                <!-- Week 4: May 18-24 (today = 22) -->
+                <div class="calendar-row">
+                  <div class="cell"><div class="day-num">18</div></div>
+                  <div class="cell"><div class="day-num">19</div></div>
+                  <div class="cell"><div class="day-num">20</div></div>
+                  <div class="cell"><div class="day-num">21</div></div>
+                  <div class="cell today"><div class="day-num">22</div></div>
+                  <div class="cell weekend">
+                    <div class="day-num">23</div>
+                    <div class="slot-row">
+                      <button class="slot-pill" disabled>09:00</button>
+                      <button class="slot-pill" disabled>11:00</button>
+                      <button class="slot-pill" disabled>13:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '23/05/2026', '16:00')">16:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '23/05/2026', '18:00')">18:00</button>
+                    </div>
+                  </div>
+                  <div class="cell weekend">
+                    <div class="day-num">24</div>
+                    <div class="slot-row">
+                      <button class="slot-pill" disabled>09:00</button>
+                      <button class="slot-pill" disabled>11:00</button>
+                      <button class="slot-pill" disabled>13:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '24/05/2026', '16:00')">16:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '24/05/2026', '18:00')">18:00</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Week 5: May 25-31 -->
+                <div class="calendar-row">
+                  <div class="cell">
+                    <div class="day-num">25</div>
+                    <div class="slot-row">
+                      <button class="slot-pill" disabled>09:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '25/05/2026', '11:00')">11:00</button>
+                      <button class="slot-pill" disabled>13:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '25/05/2026', '16:00')">16:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '25/05/2026', '18:00')">18:00</button>
+                    </div>
+                  </div>
+                  <div class="cell">
+                    <div class="day-num">26</div>
+                    <div class="slot-row">
+                      <button class="slot-pill available" onclick="pickSlot(this, '26/05/2026', '09:00')">09:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '26/05/2026', '11:00')">11:00</button>
+                      <button class="slot-pill" disabled>13:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '26/05/2026', '16:00')">16:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '26/05/2026', '18:00')">18:00</button>
+                    </div>
+                  </div>
+                  <div class="cell">
+                    <div class="day-num">27</div>
+                    <div class="slot-row">
+                      <button class="slot-pill available" onclick="pickSlot(this, '27/05/2026', '09:00')">09:00</button>
+                      <button class="slot-pill" disabled>11:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '27/05/2026', '13:00')">13:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '27/05/2026', '16:00')">16:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '27/05/2026', '18:00')">18:00</button>
+                    </div>
+                  </div>
+                  <div class="cell">
+                    <div class="day-num">28</div>
+                    <div class="slot-row">
+                      <button class="slot-pill available" onclick="pickSlot(this, '28/05/2026', '09:00')">09:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '28/05/2026', '11:00')">11:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '28/05/2026', '13:00')">13:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '28/05/2026', '16:00')">16:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '28/05/2026', '18:00')">18:00</button>
+                    </div>
+                  </div>
+                  <div class="cell">
+                    <div class="day-num">29</div>
+                    <div class="slot-row">
+                      <button class="slot-pill available" onclick="pickSlot(this, '29/05/2026', '09:00')">09:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '29/05/2026', '11:00')">11:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '29/05/2026', '13:00')">13:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '29/05/2026', '16:00')">16:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '29/05/2026', '18:00')">18:00</button>
+                    </div>
+                  </div>
+                  <div class="cell weekend">
+                    <div class="day-num">30</div>
+                    <div class="slot-row">
+                      <button class="slot-pill available" onclick="pickSlot(this, '30/05/2026', '09:00')">09:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '30/05/2026', '11:00')">11:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '30/05/2026', '13:00')">13:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '30/05/2026', '16:00')">16:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '30/05/2026', '18:00')">18:00</button>
+                    </div>
+                  </div>
+                  <div class="cell weekend">
+                    <div class="day-num">31</div>
+                    <div class="slot-row">
+                      <button class="slot-pill available" onclick="pickSlot(this, '31/05/2026', '09:00')">09:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '31/05/2026', '11:00')">11:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '31/05/2026', '13:00')">13:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '31/05/2026', '16:00')">16:00</button>
+                      <button class="slot-pill available" onclick="pickSlot(this, '31/05/2026', '18:00')">18:00</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="calendar-legend">
+                <span><span class="lg-dot" style="background:#FEE2E2; border:1px solid #FCA5A5;"></span>Available · กดเลือกได้</span>
+                <span><span class="lg-dot" style="background:#E5E7EB;"></span>Unavailable · เต็ม/ปิด</span>
+                <span><span class="lg-dot" style="background:#1E2D52;"></span>Selected · ที่เลือก</span>
+              </div>
+
+              <div id="pp-slot-preview" style="margin-top:14px; padding:12px 14px; background:#FAFBFC; border:1px solid #EDEFF3; border-radius:8px; font-size:13px; color:#6B7280; text-align:center;">
+                ยังไม่ได้เลือก slot — กรุณากดเลือกวันและเวลาที่ว่าง
+              </div>
+            </div>
+
+            <!-- ===== Step 3: Summary + Confirm ===== -->
+            <div class="pp-step-content" id="pp-step-3">
+              <div class="pp-section-title">ขั้นตอนที่ 3 — ตรวจสอบข้อมูลก่อนยืนยัน</div>
+
+              <div class="summary-banner">
+                <span style="font-size:18px;">✓</span>
+                <span>ตรวจสอบข้อมูลด้านล่างให้ถูกต้อง แล้วกด <strong>ยืนยันการเลื่อน</strong> เพื่อบันทึก</span>
+              </div>
+
+              <div class="pp-summary-grid">
+                <span class="s-label">Order ID</span>
+                <span class="s-value"><strong>WP25120000000001</strong></span>
+
+                <span class="s-label">ลูกค้า</span>
+                <span class="s-value">พรชนก สัมมาเลิศกัณท์ · 085-9050612</span>
+
+                <span class="s-label">ที่อยู่จัดส่ง</span>
+                <span class="s-value">88/12 หมู่ 5 ถ.รังสิต-นครนายก ต.ประชาธิปัตย์ อ.ธัญบุรี จ.ปทุมธานี 12130</span>
+
+                <span class="s-label">เบิกสินค้าที่ WMS ใหม่</span>
+                <span class="s-value" id="sum-wms-repick">—</span>
+
+                <span class="s-label">ประเภทการขอเลื่อน</span>
+                <span class="s-value" id="sum-reason"><strong>—</strong></span>
+
+                <span class="s-label">หมายเหตุ</span>
+                <span class="s-value" id="sum-note">—</span>
+
+                <span class="s-label" style="border-top:1px dashed #E5E7EB; padding-top:8px;">วันใหม่ที่เลือก</span>
+                <span class="s-value" id="sum-date" style="border-top:1px dashed #E5E7EB; padding-top:8px;"><strong style="color:#065F46;">—</strong></span>
+
+                <span class="s-label">Slot เวลา</span>
+                <span class="s-value" id="sum-slot"><strong style="color:#065F46;">—</strong></span>
+
+                <span class="s-label">ประเภทการจัดส่ง</span>
+                <span class="s-value" id="sum-delivery-type"><strong style="color:#065F46;">—</strong></span>
+
+                <span class="s-label">Sale Source</span>
+                <span class="s-value">WA — WhatsApp Order</span>
+
+                <span class="s-label">สาขาผู้ส่ง</span>
+                <span class="s-value">SNR — สาขา ศรีนครินทร์ 1</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Wizard navigation -->
+          <div class="pp-actions">
+            <button class="btn btn-secondary" id="pp-back" onclick="ppPrevStep()" style="display:none;">← ย้อนกลับ</button>
+            <button class="btn btn-secondary" onclick="hidePostpone()">ยกเลิก</button>
+            <button class="btn btn-primary" id="pp-next" onclick="ppNextStep()">ขั้นตอนถัดไป ›</button>
+            <button class="btn btn-success" id="pp-confirm" onclick="ppConfirm()" style="display:none;">✓ ยืนยันการเลื่อน</button>
+          </div>
+        </div>
+      </div><!-- /view-postpone -->
+      </div><!-- /view-detail -->
+
+    </main>
+  </div>
+
+</div>
+
+<!-- ============ MODAL: CANCEL ORDER ============ -->
+<div class="modal-overlay" id="cancel-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><span class="mod-icon">ℹ</span> หมายเหตุการยกเลิก · Cancel Order</h3>
+      <button class="modal-close" onclick="closeCancelModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label>ประเภทการยกเลิก <span class="req">*</span></label>
+        <select class="select" id="cancel-reason">
+          <option value="">กรุณาเลือก</option>
+          <option>ลูกค้าขอยกเลิก · Customer requested</option>
+          <option>สินค้าหมดสต็อก · Out of stock</option>
+          <option>ที่อยู่ไม่ถูกต้อง · Incorrect address</option>
+          <option>ติดต่อลูกค้าไม่ได้ · Cannot reach customer</option>
+          <option>ราคาผิดพลาด · Pricing error</option>
+          <option>อื่นๆ · Other</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>หมายเหตุการยกเลิก <span class="req">*</span></label>
+        <textarea id="cancel-note" placeholder="ระบุรายละเอียดเหตุผลการยกเลิก..."></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeCancelModal()">ปิด</button>
+      <button class="btn btn-primary" onclick="confirmCancel()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: EDIT ORDER (Delivery Option + Address only) ============ -->
+<div class="modal-overlay" id="edit-order-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3><span class="mod-icon">✏</span> แก้ไขออเดอร์ · Edit Order</h3>
+      <button class="modal-close" onclick="closeEditOrderModal()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Section 1: Delivery Option -->
+      <div class="modal-section">
+        <div class="modal-section-title">🚚 Delivery Option · ตัวเลือกการจัดส่ง</div>
+        <div class="modal-grid">
+          <div class="form-field col-full">
+            <label>Delivery Method <span class="req">*</span></label>
+            <select class="select" id="eo-method">
+              <option>Delivery — สาขาส่งเอง (รถปกติ)</option>
+              <option>Delivery — สาขาส่งเอง (รถเย็น)</option>
+              <option>Delivery — Third Party (Lalamove)</option>
+              <option>Pickup — มารับสินค้าที่สาขา</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Address -->
+      <div class="modal-section">
+        <div class="modal-section-title">📍 ที่อยู่จัดส่ง · Delivery Address</div>
+        <div class="modal-grid">
+          <div class="form-field">
+            <label>บ้านเลขที่ <span class="req">*</span></label>
+            <input type="text" class="input" id="eo-houseno" value="88/12">
+          </div>
+          <div class="form-field">
+            <label>เลขที่ห้อง</label>
+            <input type="text" class="input" id="eo-room" placeholder="(ถ้ามี)">
+          </div>
+          <div class="form-field">
+            <label>ชั้น</label>
+            <input type="text" class="input" id="eo-floor" placeholder="(ถ้ามี)">
+          </div>
+          <div class="form-field">
+            <label>โครงการ/หมู่บ้าน</label>
+            <input type="text" class="input" id="eo-village" placeholder="(ถ้ามี)">
+          </div>
+          <div class="form-field">
+            <label>หมู่</label>
+            <input type="text" class="input" id="eo-moo" value="5">
+          </div>
+          <div class="form-field">
+            <label>ซอย</label>
+            <input type="text" class="input" id="eo-soi" placeholder="(ถ้ามี)">
+          </div>
+          <div class="form-field col-full">
+            <label>ถนน</label>
+            <input type="text" class="input" id="eo-road" value="รังสิต-นครนายก">
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:11px; color:#6B7280; background:#FAFBFC; border:1px solid #EDEFF3; padding:10px 12px; border-radius:6px;">
+        🔒 <strong style="color:#1E2D52;">หมายเหตุ:</strong> ข้อมูลอื่นๆ (ตำบล/อำเภอ/จังหวัด, ลูกค้า, รายการสินค้า, Route, Shipment Date, Time Slot, Service Type) ไม่สามารถแก้ไขได้จากหน้านี้
+      </div>
+
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeEditOrderModal()">ปิด</button>
+      <button class="btn btn-primary" onclick="saveEditOrder()">💾 บันทึกข้อมูล</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.tab[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      // Update tabs
+      document.querySelectorAll('.tab[data-tab]').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      // Update panels
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + target).classList.add('active');
+      // Scroll to top of card
+      window.scrollTo({ top: document.querySelector('.card').offsetTop - 20, behavior: 'smooth' });
+    });
+  });
+
+  // ===== Cancel Modal =====
+  function openCancelModal() {
+    document.getElementById('cancel-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeCancelModal() {
+    document.getElementById('cancel-modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function confirmCancel() {
+    const reason = document.getElementById('cancel-reason').value;
+    const note = document.getElementById('cancel-note').value.trim();
+    if (!reason) { alert('กรุณาเลือกประเภทการยกเลิก'); return; }
+    if (!note) { alert('กรุณาระบุหมายเหตุการยกเลิก'); return; }
+    alert('✓ บันทึกการยกเลิกสำเร็จ\n\nประเภท: ' + reason + '\nหมายเหตุ: ' + note);
+    closeCancelModal();
+    // reset
+    document.getElementById('cancel-reason').value = '';
+    document.getElementById('cancel-note').value = '';
+  }
+  // Close modal on overlay click
+  document.getElementById('cancel-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'cancel-modal') closeCancelModal();
+  });
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeCancelModal();
+      closeEditOrderModal();
+    }
+  });
+
+  // ===== Edit Order Modal =====
+  function openEditOrderModal() {
+    document.getElementById('edit-order-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeEditOrderModal() {
+    document.getElementById('edit-order-modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function saveEditOrder() {
+    const required = ['eo-method','eo-houseno'];
+    for (const id of required) {
+      const el = document.getElementById(id);
+      if (!el.value.trim()) { alert('กรุณากรอกข้อมูลที่จำเป็นทั้งหมด (มี *)'); el.focus(); return; }
+    }
+    const addrParts = [
+      document.getElementById('eo-houseno').value,
+      document.getElementById('eo-room').value ? 'ห้อง ' + document.getElementById('eo-room').value : '',
+      document.getElementById('eo-floor').value ? 'ชั้น ' + document.getElementById('eo-floor').value : '',
+      document.getElementById('eo-village').value,
+      document.getElementById('eo-moo').value ? 'หมู่ ' + document.getElementById('eo-moo').value : '',
+      document.getElementById('eo-soi').value ? 'ซ. ' + document.getElementById('eo-soi').value : '',
+      document.getElementById('eo-road').value ? 'ถ. ' + document.getElementById('eo-road').value : ''
+    ].filter(Boolean).join(' ');
+    alert('✓ บันทึกการแก้ไขออเดอร์สำเร็จ\n\nDelivery Method: ' + document.getElementById('eo-method').value + '\nที่อยู่ใหม่: ' + addrParts);
+    closeEditOrderModal();
+  }
+  document.getElementById('edit-order-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'edit-order-modal') closeEditOrderModal();
+  });
+
+  // ===== Postpone Wizard =====
+  let ppStep = 1;
+  let ppSlot = { date: null, time: null };
+
+  function showPostpone() {
+    document.getElementById('view-main').classList.add('hidden');
+    document.getElementById('view-postpone').classList.add('active');
+    ppStep = 1;
+    ppSlot = { date: null, time: null };
+    // Reset form fields to default
+    document.getElementById('pp-wms-repick').checked = false;
+    ppUpdateUI();
+    window.scrollTo(0, 0);
+  }
+  function hidePostpone() {
+    if (ppStep > 1 && !confirm('ออกจากหน้าเลื่อนจัดส่ง? ข้อมูลที่กรอกไว้จะหายไป')) return;
+    document.getElementById('view-postpone').classList.remove('active');
+    document.getElementById('view-main').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
+
+  function ppNextStep() {
+    if (ppStep === 1) {
+      const reason = document.getElementById('pp-reason').value;
+      const note = document.getElementById('pp-note').value.trim();
+      if (!reason) { alert('กรุณาเลือกประเภทการขอเลื่อน'); return; }
+      if (!note) { alert('กรุณาระบุหมายเหตุการขอเลื่อน'); return; }
+      ppStep = 2;
+    } else if (ppStep === 2) {
+      if (!ppSlot.date || !ppSlot.time) { alert('กรุณาเลือกวันและ Slot เวลา'); return; }
+      // Fill summary
+      const wmsRepick = document.getElementById('pp-wms-repick').checked;
+      document.getElementById('sum-wms-repick').innerHTML = wmsRepick
+        ? '<span style="color:#1E40AF; font-weight:700;">✓ ใช่ — ส่งเบิกที่ WMS ใหม่</span>'
+        : '<span style="color:#6B7280;">— ไม่เบิกใหม่ (ใช้ของที่เบิกไว้แล้ว)</span>';
+      document.getElementById('sum-reason').innerHTML = '<strong>' + document.getElementById('pp-reason').value + '</strong>';
+      document.getElementById('sum-note').textContent = document.getElementById('pp-note').value.trim();
+      document.getElementById('sum-date').innerHTML = '<strong style="color:#065F46;">' + ppSlot.date + '</strong>';
+      document.getElementById('sum-slot').innerHTML = '<strong style="color:#065F46;">' + ppSlot.time + ' น.</strong>';
+      document.getElementById('sum-delivery-type').innerHTML = '<strong style="color:#065F46;">' + document.getElementById('pp-delivery-type').value + '</strong>';
+      ppStep = 3;
+    }
+    ppUpdateUI();
+  }
+  function ppPrevStep() {
+    if (ppStep > 1) ppStep--;
+    ppUpdateUI();
+  }
+  function ppUpdateUI() {
+    // Step indicators
+    for (let i = 1; i <= 3; i++) {
+      const ind = document.getElementById('step-indicator-' + i);
+      ind.classList.remove('active', 'done');
+      if (i < ppStep) ind.classList.add('done');
+      else if (i === ppStep) ind.classList.add('active');
+    }
+    // Dashes
+    document.getElementById('dash-1').classList.toggle('done', ppStep > 1);
+    document.getElementById('dash-2').classList.toggle('done', ppStep > 2);
+    // Step content
+    for (let i = 1; i <= 3; i++) {
+      document.getElementById('pp-step-' + i).classList.toggle('active', i === ppStep);
+    }
+    // Buttons
+    document.getElementById('pp-back').style.display = ppStep > 1 ? '' : 'none';
+    document.getElementById('pp-next').style.display = ppStep < 3 ? '' : 'none';
+    document.getElementById('pp-confirm').style.display = ppStep === 3 ? '' : 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function pickSlot(el, date, time) {
+    document.querySelectorAll('.slot-pill.selected').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+    ppSlot = { date, time };
+    document.getElementById('pp-slot-preview').innerHTML =
+      '✓ เลือกแล้ว: <strong style="color:#1E2D52;">' + date + ' · ' + time + ' น.</strong>';
+    document.getElementById('pp-slot-preview').style.background = '#ECFDF5';
+    document.getElementById('pp-slot-preview').style.borderColor = '#A7F3D0';
+    document.getElementById('pp-slot-preview').style.color = '#065F46';
+  }
+
+  function ppConfirm() {
+    alert('✓ บันทึกการเลื่อนจัดส่งสำเร็จ\n\nวันใหม่: ' + ppSlot.date + ' · ' + ppSlot.time + ' น.\nประเภท: ' + document.getElementById('pp-reason').value + '\nหมายเหตุ: ' + document.getElementById('pp-note').value.trim());
+    // Reset and go back
+    document.getElementById('pp-reason').value = '';
+    document.getElementById('pp-note').value = '';
+    document.querySelectorAll('.slot-pill.selected').forEach(p => p.classList.remove('selected'));
+    ppSlot = { date: null, time: null };
+    ppStep = 1;
+    document.getElementById('view-postpone').classList.remove('active');
+    document.getElementById('view-main').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
+
+  // ===== Sortable Table Headers (table.data + table.promo-sku) =====
+  document.querySelectorAll('table.data, table.promo-sku').forEach(table => {
+    const headers = table.querySelectorAll('thead th');
+    headers.forEach(th => {
+      if (th.classList.contains('no-sort')) return;
+      th.addEventListener('click', () => {
+        const wasAsc = th.classList.contains('sort-asc');
+        const wasDesc = th.classList.contains('sort-desc');
+        headers.forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
+        if (wasAsc) th.classList.add('sort-desc');
+        else if (wasDesc) { /* third click clears */ }
+        else th.classList.add('sort-asc');
+      });
+    });
+  });
+
+  /* =====================================================================
+     ORDER LIST — data, filtering, sorting, pagination, export, navigation
+     ===================================================================== */
+  var BR_SNR = 'SNR — บริษัท เซ็นทรัล ฟู้ด โฮลเซลล์ จำกัด (สาขา ศรีนครินทร์ 1)';
+  var BR_RS  = 'RS — รังสิต ปทุมธานี';
+  var BR_BKK = 'BKK — สีลม';
+
+  // status -> chip class
+  var STATUS_CLS = {
+    'รายการใหม่': 'info',
+    'กำลังจัดเตรียม': 'pending',
+    'พร้อมจัดส่ง': 'info',
+    'กำลังจัดส่ง': 'info',
+    'จัดส่งสำเร็จ': 'success',
+    'ยกเลิก': 'danger'
+  };
+
+  // date stored as 'YYYY-MM-DD HH:mm' (sortable). Display as DD/MM/YYYY HH:mm
+  var ORDERS = [
+    { orderNo:'WP25120000000001', status:'กำลังจัดส่ง',   orderType:'Normal Order', date:'2025-12-10 22:14', branch:BR_RS,  customer:'พรชนก สัมมาเลิศกัณท์',   phone:'085-9050612', the1:'T1-1832-4421-908' },
+    { orderNo:'WP25120010000045', status:'จัดส่งสำเร็จ',   orderType:'Normal Order', date:'2025-12-09 09:32', branch:BR_SNR, customer:'นัยนา รัมรื่น',           phone:'089-114-2032', the1:'T1-2210-7781-114' },
+    { orderNo:'XB26010010000423', status:'กำลังจัดเตรียม', orderType:'Normal Order', date:'2025-12-08 17:45', branch:BR_SNR, customer:'Lam Ton',                phone:'062-553-9087', the1:'T1-9931-2240-771' },
+    { orderNo:'WP26010010000277', status:'พร้อมจัดส่ง',    orderType:'Pre Order',    date:'2025-12-07 11:20', branch:BR_RS,  customer:'yotsawat chanbokaew',   phone:'081-220-7745', the1:'T1-4451-9087-220' },
+    { orderNo:'XC26010010000510', status:'จัดส่งสำเร็จ',   orderType:'Normal Order', date:'2025-12-06 16:53', branch:BR_BKK, customer:'สมเกียรติ ตั้งตระกูลแสง', phone:'086-771-0098', the1:'T1-3320-1184-665' },
+    { orderNo:'WP26010010000396', status:'ยกเลิก',         orderType:'Normal Order', date:'2025-12-05 16:58', branch:BR_SNR, customer:'กัญฐณา ตื่นสุข',         phone:'084-009-2231', the1:'T1-7740-3321-009' },
+    { orderNo:'WP26010010000379', status:'รายการใหม่',     orderType:'Pre Order',    date:'2025-12-05 11:07', branch:BR_BKK, customer:'Kanokchai Likitapiwat', phone:'085-516-9151', the1:'T1-1102-8847-330' },
+    { orderNo:'XB26010010000351', status:'กำลังจัดส่ง',    orderType:'Normal Order', date:'2025-12-04 11:53', branch:BR_RS,  customer:'Rada Rattanachaiwongsri', phone:'090-447-1180', the1:'T1-5567-2290-441' },
+    { orderNo:'WP26010010000334', status:'กำลังจัดเตรียม', orderType:'Pre Order',    date:'2025-12-03 16:04', branch:BR_SNR, customer:'ธนวัฒน์ ศรีสวัสดิ์',      phone:'083-901-7762', the1:'T1-8845-1120-993' },
+    { orderNo:'WP26010010000327', status:'จัดส่งสำเร็จ',   orderType:'Normal Order', date:'2025-12-02 14:50', branch:BR_BKK, customer:'อรทัย พงษ์เจริญ',        phone:'087-225-6610', the1:'T1-6678-9931-220' },
+    { orderNo:'XB26010010000258', status:'พร้อมจัดส่ง',    orderType:'Normal Order', date:'2025-12-02 16:25', branch:BR_RS,  customer:'วิชัย กิตติคุณ',          phone:'081-345-2210', the1:'T1-2231-7780-114' },
+    { orderNo:'XC26010010000278', status:'กำลังจัดส่ง',    orderType:'Normal Order', date:'2025-12-01 16:03', branch:BR_SNR, customer:'สุดารัตน์ แก้วมณี',       phone:'089-667-1120', the1:'T1-9912-3340-118' },
+    { orderNo:'WP26010010000201', status:'รายการใหม่',     orderType:'Pre Order',    date:'2025-12-01 09:18', branch:BR_BKK, customer:'ปิยะ ทองสุข',           phone:'086-119-4408', the1:'T1-3345-6678-991' },
+    { orderNo:'WP25110010000188', status:'จัดส่งสำเร็จ',   orderType:'Normal Order', date:'2025-11-29 13:40', branch:BR_RS,  customer:'มนตรี อินทรประเสริฐ',     phone:'082-554-7790', the1:'T1-7781-2204-556' },
+    { orderNo:'XB25110010000150', status:'ยกเลิก',         orderType:'Normal Order', date:'2025-11-28 10:05', branch:BR_SNR, customer:'จันทิมา โพธิ์ทอง',        phone:'088-220-3345', the1:'T1-4456-8890-221' },
+    { orderNo:'WP25110010000142', status:'กำลังจัดเตรียม', orderType:'Pre Order',    date:'2025-11-27 18:22', branch:BR_BKK, customer:'เอกชัย วัฒนกุล',         phone:'090-771-5523', the1:'T1-1190-3367-884' },
+    { orderNo:'WP25110010000133', status:'พร้อมจัดส่ง',    orderType:'Normal Order', date:'2025-11-26 08:47', branch:BR_RS,  customer:'รัตนา ศิริวงศ์',          phone:'083-446-7781', the1:'T1-6612-9903-447' },
+    { orderNo:'XC25110010000120', status:'กำลังจัดส่ง',    orderType:'Normal Order', date:'2025-11-25 15:30', branch:BR_SNR, customer:'ประภาส ชัยมงคล',         phone:'087-009-2218', the1:'T1-2278-4451-330' }
+  ];
+
+  var listState = { filtered: ORDERS.slice(), page: 1, pageSize: 10, sortKey: 'date', sortDir: 'desc' };
+
+  function uniq(arr){ var o={},r=[]; for(var i=0;i<arr.length;i++){ if(!o[arr[i]]){o[arr[i]]=1;r.push(arr[i]);} } return r; }
+
+  function fmtDate(iso){
+    // 'YYYY-MM-DD HH:mm' -> 'DD/MM/YYYY HH:mm'
+    var p = iso.split(' '); var d = p[0].split('-');
+    return d[2] + '/' + d[1] + '/' + d[0] + ' ' + (p[1]||'');
+  }
+
+  function initFilters(){
+    var bSel=document.getElementById('f-branch');
+    uniq(ORDERS.map(function(o){return o.branch;})).forEach(function(b){
+      var op=document.createElement('option'); op.value=b; op.textContent=b.split(' (')[0]; bSel.appendChild(op);
+    });
+    var sSel=document.getElementById('f-status');
+    uniq(ORDERS.map(function(o){return o.status;})).forEach(function(s){
+      var op=document.createElement('option'); op.value=s; op.textContent=s; sSel.appendChild(op);
+    });
+    var tSel=document.getElementById('f-type');
+    uniq(ORDERS.map(function(o){return o.orderType;})).forEach(function(t){
+      var op=document.createElement('option'); op.value=t; op.textContent=t; tSel.appendChild(op);
+    });
+    // default date range to span data
+    document.getElementById('f-date-from').value='2025-11-01';
+    document.getElementById('f-date-to').value='2025-12-31';
+  }
+
+  function getFilters(){
+    return {
+      from:   document.getElementById('f-date-from').value,
+      to:     document.getElementById('f-date-to').value,
+      branch: document.getElementById('f-branch').value,
+      status: document.getElementById('f-status').value,
+      type:   document.getElementById('f-type').value,
+      orderNo:document.getElementById('f-orderno').value.trim().toLowerCase(),
+      cust:   document.getElementById('f-customer').value.trim().toLowerCase(),
+      phone:  document.getElementById('f-phone').value.trim().replace(/[-\s]/g,''),
+      the1:   document.getElementById('f-the1').value.trim().toLowerCase()
+    };
+  }
+
+  function applySearch(){
+    var f=getFilters();
+    listState.filtered = ORDERS.filter(function(o){
+      var od = o.date.split(' ')[0];
+      if(f.from && od < f.from) return false;
+      if(f.to   && od > f.to)   return false;
+      if(f.branch && o.branch !== f.branch) return false;
+      if(f.status && o.status !== f.status) return false;
+      if(f.type   && o.orderType !== f.type) return false;
+      if(f.orderNo && o.orderNo.toLowerCase().indexOf(f.orderNo)===-1) return false;
+      if(f.cust && o.customer.toLowerCase().indexOf(f.cust)===-1) return false;
+      if(f.phone && o.phone.replace(/[-\s]/g,'').indexOf(f.phone)===-1) return false;
+      if(f.the1 && o.the1.toLowerCase().indexOf(f.the1)===-1) return false;
+      return true;
+    });
+    listState.page = 1;
+    renderList();
+  }
+
+  function clearFilters(){
+    ['f-orderno','f-customer','f-phone','f-the1'].forEach(function(id){ document.getElementById(id).value=''; });
+    document.getElementById('f-branch').value='';
+    document.getElementById('f-status').value='';
+    document.getElementById('f-type').value='';
+    document.getElementById('f-date-from').value='2025-11-01';
+    document.getElementById('f-date-to').value='2025-12-31';
+    listState.filtered = ORDERS.slice();
+    listState.page = 1;
+    renderList();
+  }
+
+  function changePageSize(){
+    listState.pageSize = parseInt(document.getElementById('page-size').value,10) || 10;
+    listState.page = 1;
+    renderList();
+  }
+
+  function sortBy(key){
+    if(listState.sortKey===key){ listState.sortDir = (listState.sortDir==='asc')?'desc':'asc'; }
+    else { listState.sortKey=key; listState.sortDir='asc'; }
+    renderList();
+  }
+
+  function renderList(){
+    var data = listState.filtered.slice();
+    var key=listState.sortKey, dir=listState.sortDir==='asc'?1:-1;
+    data.sort(function(a,b){
+      var x=a[key], y=b[key];
+      if(x<y) return -1*dir; if(x>y) return 1*dir; return 0;
+    });
+
+    var total=data.length;
+    var ps=listState.pageSize;
+    var pages=Math.max(1, Math.ceil(total/ps));
+    if(listState.page>pages) listState.page=pages;
+    var start=(listState.page-1)*ps;
+    var pageRows=data.slice(start, start+ps);
+
+    var tb=document.getElementById('order-tbody');
+    tb.innerHTML='';
+    if(pageRows.length===0){
+      tb.innerHTML='<tr class="empty-row"><td colspan="8">ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา</td></tr>';
+    } else {
+      pageRows.forEach(function(o,i){
+        var cls=STATUS_CLS[o.status]||'info';
+        var tr=document.createElement('tr');
+        tr.onclick=function(){ showDetail(o.orderNo); };
+        tr.innerHTML =
+          '<td class="col-no">'+(start+i+1)+'</td>'+
+          '<td class="col-num">'+o.orderNo+'</td>'+
+          '<td><span class="status-chip '+cls+'"><span class="dot"></span>'+o.status+'</span></td>'+
+          '<td>'+o.orderType+'</td>'+
+          '<td class="col-num">'+fmtDate(o.date)+'</td>'+
+          '<td class="col-branch">'+o.branch+'</td>'+
+          '<td>'+o.customer+'</td>'+
+          '<td class="col-action"><button class="icon-action-btn" title="ดูรายละเอียด" onclick="event.stopPropagation(); showDetail(\''+o.orderNo+'\')">👁</button></td>';
+        tb.appendChild(tr);
+      });
+    }
+
+    document.getElementById('result-count').textContent='จำนวน '+total+' รายการ';
+    var fromN = total===0?0:(start+1);
+    var toN = Math.min(start+ps, total);
+    document.getElementById('page-info').innerHTML='แสดง <strong style="color:#1E2D52;">'+fromN+' – '+toN+'</strong> จาก <strong style="color:#1E2D52;">'+total+'</strong> รายการ';
+
+    // header sort indicators
+    document.querySelectorAll('#order-table thead th[data-sort]').forEach(function(th){
+      th.classList.remove('sort-asc','sort-desc');
+      if(th.getAttribute('data-sort')===listState.sortKey){
+        th.classList.add(listState.sortDir==='asc'?'sort-asc':'sort-desc');
+      }
+    });
+
+    renderPager(pages);
+  }
+
+  function renderPager(pages){
+    var p=listState.page;
+    var pager=document.getElementById('pager');
+    var html='';
+    html+='<button class="page-btn" title="หน้าแรก" '+(p<=1?'disabled':'')+' onclick="gotoPage(1)">|‹</button>';
+    html+='<button class="page-btn" title="หน้าก่อนหน้า" '+(p<=1?'disabled':'')+' onclick="gotoPage('+(p-1)+')">‹</button>';
+    var win=[];
+    for(var i=1;i<=pages;i++){
+      if(i===1||i===pages||(i>=p-1&&i<=p+1)) win.push(i);
+      else if(win[win.length-1]!=='…') win.push('…');
+    }
+    win.forEach(function(it){
+      if(it==='…') html+='<button class="page-btn" disabled>…</button>';
+      else html+='<button class="page-btn'+(it===p?' active':'')+'" onclick="gotoPage('+it+')">'+it+'</button>';
+    });
+    html+='<button class="page-btn" title="หน้าถัดไป" '+(p>=pages?'disabled':'')+' onclick="gotoPage('+(p+1)+')">›</button>';
+    html+='<button class="page-btn" title="หน้าสุดท้าย" '+(p>=pages?'disabled':'')+' onclick="gotoPage('+pages+')">›|</button>';
+    pager.innerHTML=html;
+  }
+
+  function gotoPage(p){ listState.page=p; renderList(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  /* ===== Navigation: List <-> Detail ===== */
+  function showDetail(orderNo){
+    var o=null;
+    for(var i=0;i<ORDERS.length;i++){ if(ORDERS[i].orderNo===orderNo){ o=ORDERS[i]; break; } }
+    if(o){
+      var oid=document.getElementById('od-orderid-val'); if(oid) oid.textContent=o.orderNo;
+      var cn=document.getElementById('od-custname'); if(cn) cn.textContent=o.customer;
+      var ph=document.getElementById('od-phone'); if(ph){ ph.textContent='📞 '+o.phone; ph.setAttribute('href','tel:'+o.phone.replace(/[-\s]/g,'')); }
+    }
+    var crumb=document.getElementById('crumb-current'); if(crumb) crumb.textContent='Order Detail';
+    // reset detail to first tab + ensure main (not postpone) visible
+    document.querySelectorAll('.tab[data-tab]').forEach(function(t,idx){ t.classList.toggle('active', idx===0); });
+    document.querySelectorAll('.panel').forEach(function(pn){ pn.classList.toggle('active', pn.id==='panel-order'); });
+    var vp=document.getElementById('view-postpone'); if(vp) vp.classList.remove('active');
+    var vm=document.getElementById('view-main'); if(vm) vm.classList.remove('hidden');
+    document.getElementById('view-list').classList.add('hidden');
+    document.getElementById('view-detail').classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  function backToList(){
+    document.getElementById('view-detail').classList.remove('active');
+    document.getElementById('view-list').classList.remove('hidden');
+    var crumb=document.getElementById('crumb-current'); if(crumb) crumb.textContent='Order List';
+    window.scrollTo(0,0);
+  }
+
+  /* ===== Excel (.xls) export of current filtered result ===== */
+  function downloadExcel(){
+    var rows=listState.filtered.slice();
+    var key=listState.sortKey, dir=listState.sortDir==='asc'?1:-1;
+    rows.sort(function(a,b){ var x=a[key],y=b[key]; if(x<y)return -1*dir; if(x>y)return 1*dir; return 0; });
+    var head=['No.','เลขที่คำสั่งซื้อ','สถานะ','Order Type','วันที่','สาขา','ลูกค้า','เบอร์โทรศัพท์','The 1 Card'];
+    var html='<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"></head><body><table border="1"><tr>';
+    head.forEach(function(h){ html+='<th>'+h+'</th>'; });
+    html+='</tr>';
+    rows.forEach(function(o,i){
+      html+='<tr>'+
+        '<td>'+(i+1)+'</td>'+
+        '<td>'+o.orderNo+'</td>'+
+        '<td>'+o.status+'</td>'+
+        '<td>'+o.orderType+'</td>'+
+        '<td>'+fmtDate(o.date)+'</td>'+
+        '<td>'+o.branch+'</td>'+
+        '<td>'+o.customer+'</td>'+
+        '<td>'+o.phone+'</td>'+
+        '<td>'+o.the1+'</td>'+
+      '</tr>';
+    });
+    html+='</table></body></html>';
+    var blob=new Blob(['﻿'+html], {type:'application/vnd.ms-excel;charset=utf-8'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='Order_List_'+(new Date().toISOString().slice(0,10))+'.xls';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
+
+  /* ===== Wire list header sorting + initial render ===== */
+  document.querySelectorAll('#order-table thead th[data-sort]').forEach(function(th){
+    th.addEventListener('click', function(){ sortBy(th.getAttribute('data-sort')); });
+  });
+  initFilters();
+  renderList();
+
+</script>
+
+</body>
+</html>

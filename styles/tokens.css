@@ -1,0 +1,408 @@
+/* ============================================================================
+ * CENTRAL GROUP SPRINT — TMS Design System
+ * tokens.css — Single source of truth for all visual values.
+ *
+ * v1.1.0 — Recalibrated against the production reference screenshot
+ *          Ref/Screenshot 2026-08-25 114037.png ("การจัดการงานขนส่ง").
+ *          Values marked [measured] were sampled from that screenshot.
+ *          Values marked [proposed] do not appear in the reference and must be
+ *          confirmed against a real screen before use.
+ *
+ * RULES
+ *  1. Never hardcode a color, spacing, radius, font-size or shadow in a
+ *     component. Reference a token from this file.
+ *  2. Components consume SEMANTIC tokens (--surface-*, --text-*, --border-*),
+ *     not PRIMITIVE tokens (--color-neutral-300).
+ *  3. Primitives change rarely. Semantics map primitives to intent.
+ *  4. New token? Add it here first, document it in DESIGN.md, then use it.
+ * ==========================================================================*/
+
+/* ---------------------------------------------------------------------------
+ * 1. PRIMITIVES — raw palette. Do not use directly in components.
+ * ------------------------------------------------------------------------ */
+:root {
+  /* Brand / Primary — navy. #334d6e is THE brand colour. [measured] */
+  --color-primary-900: #16233a;
+  --color-primary-800: #1d2f4a;
+  --color-primary-700: #273b5b; /* [measured] sidebar label text, pressed */
+  --color-primary-600: #2c4463; /* hover */
+  --color-primary-500: #334d6e; /* [measured] BASE — buttons, logo, title */
+  --color-primary-400: #4a6284;
+  --color-primary-300: #7488a3;
+  --color-primary-200: #a8b6c8;
+  --color-primary-100: #d5dce5;
+  --color-primary-50:  #eef1f5;
+
+  /* Slate — the blue-grey used for secondary text, icons and control outlines */
+  --color-slate-600: #44566c; /* [measured] toolbar icon */
+  --color-slate-500: #5a6b7f; /* [measured] section header, breadcrumb, link */
+  --color-slate-400: #707683; /* [measured] muted text, input outline */
+  --color-slate-300: #98a1ac;
+
+  /* Neutral — surfaces, borders, text */
+  --color-neutral-900: #212121; /* [measured] primary text */
+  --color-neutral-700: #4a4a4a;
+  --color-neutral-500: #777777; /* [measured] checkbox / radio outline */
+  --color-neutral-400: #9d9d9c;
+  --color-neutral-300: #dee2e6; /* [measured] table row divider */
+  --color-neutral-250: #dfdfdf; /* [measured] card section divider */
+  --color-neutral-200: #e3e3e3;
+  --color-neutral-100: #f4f4f4; /* [measured] hover / active nav fill */
+  --color-neutral-50:  #fafafa; /* [measured] page background */
+  --color-white:       #ffffff;
+  --color-black:       #000000;
+
+  /* Warning / attention — amber [measured] */
+  --color-warning-600: #d98f16;
+  --color-warning-500: #ffb946; /* [measured] "ยังไม่ล็อครถ" status icon */
+  --color-warning-100: #ffeccb;
+  --color-warning-50:  #fff8ec;
+
+  /* Danger — red [measured] */
+  --color-danger-600: #c04a4a;
+  --color-danger-500: #da6060; /* [measured] active nav icon, destructive */
+  --color-danger-100: #f7d9d9;
+  --color-danger-50:  #fdf0f0;
+
+  /* Success — [proposed] not present in the reference. Confirm before use. */
+  --color-success-600: #268a5c;
+  --color-success-500: #2e9e6b;
+  --color-success-100: #d3ece0;
+  --color-success-50:  #eff8f3;
+
+  /* Info — [proposed] not present in the reference. Confirm before use. */
+  --color-info-600: #2f74a8;
+  --color-info-500: #3d8ec7;
+  --color-info-100: #d6e8f4;
+  --color-info-50:  #eff6fb;
+}
+
+/* ---------------------------------------------------------------------------
+ * 2. SEMANTIC COLOR — what components actually reference.
+ * NOTE: the shell is LIGHT. Sidebar and top bar are white, not navy.
+ * ------------------------------------------------------------------------ */
+:root {
+  /* Surfaces */
+  --surface-page:      var(--color-neutral-50);  /* #fafafa app background */
+  --surface-default:   var(--color-white);       /* cards, tables, forms */
+  --surface-shell:     var(--color-white);       /* sidebar + top bar */
+  --surface-subtle:    var(--color-neutral-50);
+  --surface-raised:    var(--color-white);       /* dialog, popover, menu */
+  --surface-hover:     var(--color-neutral-100); /* #f4f4f4 */
+  --surface-active:    var(--color-neutral-100); /* active nav item */
+  --surface-selected:  var(--color-primary-50);
+  --surface-disabled:  var(--color-neutral-100);
+  --surface-overlay:   rgba(33, 33, 33, 0.40);   /* modal scrim */
+
+  /* Text */
+  --text-primary:      var(--color-neutral-900); /* #212121 body, cells */
+  --text-secondary:    var(--color-slate-500);   /* #5a6b7f section header */
+  --text-tertiary:     var(--color-slate-400);   /* #707683 labels, meta */
+  --text-placeholder:  var(--color-slate-400);
+  --text-disabled:     var(--color-neutral-400);
+  --text-brand:        var(--color-primary-500); /* page title, logo */
+  --text-nav:          var(--color-primary-700); /* sidebar item label */
+  --text-inverse:      var(--color-white);
+  --text-link:         var(--color-slate-500);   /* underlined utility link */
+  --text-link-hover:   var(--color-primary-500);
+  --text-warning:      var(--color-warning-600);
+  --text-danger:       var(--color-danger-600);
+  --text-success:      var(--color-success-600);
+  --text-info:         var(--color-info-600);
+
+  /* Borders — used sparingly. Separation is mostly shadow + background step. */
+  --border-default:    var(--color-neutral-300); /* #dee2e6 table dividers */
+  --border-divider:    var(--color-neutral-250); /* #dfdfdf card section rule */
+  --border-control:    var(--color-slate-400);   /* #707683 input outline */
+  --border-control-hover: var(--color-neutral-900);
+  --border-focus:      var(--color-primary-500);
+  --border-danger:     var(--color-danger-500);
+  --border-selection:  var(--color-neutral-500); /* checkbox / radio */
+
+  /* Interactive — primary action (solid navy) */
+  --action-primary-bg:          var(--color-primary-500);
+  --action-primary-bg-hover:    var(--color-primary-600);
+  --action-primary-bg-active:   var(--color-primary-700);
+  --action-primary-bg-disabled: var(--color-neutral-200);
+  --action-primary-text:        var(--color-white);
+
+  /* Interactive — secondary / outline */
+  --action-secondary-bg:        var(--color-white);
+  --action-secondary-bg-hover:  var(--color-neutral-100);
+  --action-secondary-text:      var(--color-primary-500);
+  --action-secondary-border:    var(--color-primary-500);
+
+  /* Interactive — ghost / icon button */
+  --action-ghost-text:          var(--color-slate-600);
+  --action-ghost-text-hover:    var(--color-primary-500);
+  --action-ghost-bg-hover:      var(--color-neutral-100);
+
+  /* Interactive — destructive */
+  --action-danger-bg:           var(--color-danger-500);
+  --action-danger-bg-hover:     var(--color-danger-600);
+  --action-danger-text:         var(--color-white);
+
+  /* Focus ring — same treatment for every focusable element */
+  --focus-ring-color:  var(--color-primary-500);
+  --focus-ring-width:  2px;
+  --focus-ring-offset: 2px;
+  --focus-ring:        0 0 0 var(--focus-ring-width) var(--color-primary-200);
+
+  /* Status — inline icon + label, NOT a filled pill.
+     `icon` tints the leading dot/glyph; `text` is the label colour. */
+  --status-neutral-icon: var(--color-slate-400);
+  --status-neutral-text: var(--color-neutral-900);
+  --status-warning-icon: var(--color-warning-500); /* ยังไม่ล็อครถ / pending */
+  --status-warning-text: var(--color-neutral-900);
+  --status-danger-icon:  var(--color-danger-500);
+  --status-danger-text:  var(--color-neutral-900);
+  --status-success-icon: var(--color-success-500); /* [proposed] */
+  --status-success-text: var(--color-neutral-900);
+  --status-info-icon:    var(--color-info-500);    /* [proposed] */
+  --status-info-text:    var(--color-neutral-900);
+
+  /* Soft-fill variant — only where a table cell needs a stronger flag */
+  --status-warning-bg: var(--color-warning-50);
+  --status-danger-bg:  var(--color-danger-50);
+  --status-success-bg: var(--color-success-50);
+  --status-info-bg:    var(--color-info-50);
+  --status-neutral-bg: var(--color-neutral-100);
+}
+
+/* ---------------------------------------------------------------------------
+ * 3. TYPOGRAPHY
+ * The reference is Thai-first. Latin and Thai share one stack so mixed
+ * strings sit on a common baseline.
+ * TODO: confirm the production face with the team — the reference is
+ * consistent with Prompt / Sarabun. Change only this one token when known.
+ * ------------------------------------------------------------------------ */
+:root {
+  --font-family-base: "Prompt", "Sarabun", "Noto Sans Thai",
+                      -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-family-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+
+  /* Size scale — 13px is the workhorse. [measured] */
+  --font-size-2xs: 10px;
+  --font-size-xs:  11px;
+  --font-size-sm:  12px;
+  --font-size-md:  13px; /* [measured] body, table cell, input, button, label */
+  --font-size-lg:  14px;
+  --font-size-xl:  16px;
+  --font-size-2xl: 18px; /* [measured] card section header */
+  --font-size-3xl: 20px; /* [measured] page title */
+  --font-size-4xl: 24px; /* KPI figure only */
+
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  /* Thai needs more leading than Latin — tone marks sit above the ascender. */
+  --line-height-tight:   1.35;
+  --line-height-snug:    1.45;
+  --line-height-normal:  1.55;
+  --line-height-relaxed: 1.7;
+
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide:   0.02em;
+}
+
+/* ---------------------------------------------------------------------------
+ * 4. SPACING — 4px base grid.
+ * ------------------------------------------------------------------------ */
+:root {
+  --space-0:  0px;
+  --space-1:  2px;
+  --space-2:  4px;
+  --space-3:  6px;
+  --space-4:  8px;
+  --space-5:  12px;
+  --space-6:  16px;
+  --space-7:  20px;
+  --space-8:  24px;
+  --space-9:  28px;
+  --space-10: 32px;
+  --space-11: 40px;
+  --space-12: 48px;
+  --space-13: 64px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 5. RADIUS / BORDER WIDTH
+ * ------------------------------------------------------------------------ */
+:root {
+  --radius-none: 0px;
+  --radius-xs:   2px;
+  --radius-sm:   4px; /* [measured] DEFAULT — button, input, card, select */
+  --radius-md:   4px; /* alias, kept so component code reads naturally */
+  --radius-lg:   8px; /* dialog */
+  --radius-full: 9999px; /* avatar, status dot, search field only */
+
+  --border-width-none: 0px;
+  --border-width-hairline: 1px; /* dividers and control outlines */
+  --border-width-thick: 2px;    /* active tab underline, focus */
+}
+
+/* ---------------------------------------------------------------------------
+ * 6. ELEVATION
+ * In this system separation comes from a SOFT AMBIENT SHADOW plus the
+ * #fafafa → #ffffff background step, not from outlines. Cards and the sidebar
+ * have no border in the reference.
+ * ------------------------------------------------------------------------ */
+:root {
+  --shadow-none: none;
+  --shadow-shell: 0 0 6px rgba(33, 33, 33, 0.06);   /* sidebar / top bar edge */
+  --shadow-card:  0 1px 6px rgba(33, 33, 33, 0.06); /* content container */
+  --shadow-md:    0 4px 12px rgba(33, 33, 33, 0.12); /* dropdown, popover */
+  --shadow-lg:    0 12px 32px rgba(33, 33, 33, 0.18); /* dialog */
+}
+
+/* ---------------------------------------------------------------------------
+ * 7. CONTROL SIZING — comfortable, not compact. [measured]
+ * ------------------------------------------------------------------------ */
+:root {
+  --control-height-xs: 28px;
+  --control-height-sm: 32px;
+  --control-height-md: 36px; /* [measured] DEFAULT button / input / select */
+  --control-height-lg: 40px;
+
+  --control-padding-x-sm: var(--space-5);
+  --control-padding-x-md: var(--space-6);
+  --control-padding-x-lg: var(--space-7);
+
+  --icon-size-xs: 14px;
+  --icon-size-sm: 16px;
+  --icon-size-md: 18px; /* default inline icon */
+  --icon-size-lg: 20px; /* sidebar nav icon, toolbar icon */
+  --icon-size-xl: 32px; /* empty state */
+
+  --selection-control-size: 16px; /* [measured] checkbox / radio */
+
+  /* Table [measured] */
+  --table-header-height:   48px;
+  --table-row-min-height:  48px; /* grows to ~62px when a cell wraps to 2 lines */
+  --table-cell-padding-x:  var(--space-6); /* 16px */
+  --table-cell-padding-y:  var(--space-5); /* 12px */
+  --table-toolbar-height:  var(--control-height-md);
+  --table-paginator-height: 56px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 8. LAYOUT [measured]
+ * ------------------------------------------------------------------------ */
+:root {
+  --layout-sidebar-width:           234px;
+  --layout-sidebar-width-collapsed: 64px;
+  --layout-topbar-height:           56px;
+  --layout-page-padding-x:          28px;
+  --layout-page-padding-y:          24px;
+  --layout-page-title-gap:          var(--space-5);
+  --layout-content-max-width:       none; /* content is full-bleed to gutters */
+  --layout-panel-gap:               var(--space-8);
+  --layout-card-header-height:      64px;
+  --layout-card-padding-x:          var(--space-7);
+  --layout-card-padding-y:          var(--space-6);
+  --layout-form-column-gap:         var(--space-8);
+  --layout-form-row-gap:            var(--space-6);
+  --layout-drawer-width:            480px;
+  --layout-dialog-width-sm:         420px;
+  --layout-dialog-width-md:         600px;
+  --layout-dialog-width-lg:         880px;
+
+  /* Sidebar navigation [measured] */
+  --nav-item-height:      40px;
+  --nav-subitem-height:   32px;
+  --nav-item-padding-x:   var(--space-6);
+  --nav-subitem-indent:   var(--space-11);
+}
+
+/* ---------------------------------------------------------------------------
+ * 9. Z-INDEX — one scale, no ad-hoc values.
+ * ------------------------------------------------------------------------ */
+:root {
+  --z-base:     0;
+  --z-sticky:   100;
+  --z-topbar:   200;
+  --z-sidebar:  300;
+  --z-dropdown: 400;
+  --z-overlay:  500;
+  --z-dialog:   600;
+  --z-toast:    700;
+  --z-tooltip:  800;
+}
+
+/* ---------------------------------------------------------------------------
+ * 10. MOTION — short, functional, never decorative.
+ * ------------------------------------------------------------------------ */
+:root {
+  --duration-instant: 80ms;
+  --duration-fast:    120ms;
+  --duration-normal:  180ms;
+  --duration-slow:    240ms;
+
+  --easing-standard:   cubic-bezier(0.2, 0, 0.2, 1);
+  --easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --easing-accelerate: cubic-bezier(0.4, 0, 1, 1);
+
+  --transition-control: background-color var(--duration-fast) var(--easing-standard),
+                        border-color var(--duration-fast) var(--easing-standard),
+                        color var(--duration-fast) var(--easing-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-instant: 0ms;
+    --duration-fast:    0ms;
+    --duration-normal:  0ms;
+    --duration-slow:    0ms;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * 11. ANGULAR MATERIAL BRIDGE
+ * The reference UI is built on Angular Material (mat-form-field outline,
+ * mat-select, mat-datepicker, mat-paginator, mat-checkbox). Map Material's
+ * system variables to our tokens ONCE, here — never restyle Material with
+ * ::ng-deep in a feature component.
+ * ------------------------------------------------------------------------ */
+:root {
+  --mat-sys-primary:            var(--color-primary-500);
+  --mat-sys-on-primary:         var(--color-white);
+  --mat-sys-surface:            var(--surface-default);
+  --mat-sys-on-surface:         var(--text-primary);
+  --mat-sys-on-surface-variant: var(--text-tertiary);
+  --mat-sys-outline:            var(--border-control);
+  --mat-sys-outline-variant:    var(--border-default);
+  --mat-sys-error:              var(--color-danger-500);
+  --mat-sys-corner-small:       var(--radius-sm);
+  --mat-sys-body-medium-size:   var(--font-size-md);
+  --mat-sys-body-medium-font:   var(--font-family-base);
+}
+
+/* ---------------------------------------------------------------------------
+ * 12. DARK THEME — [proposed] not in the reference. Phase 2, unverified.
+ * Only semantic tokens are re-mapped. Primitives never change.
+ * ------------------------------------------------------------------------ */
+:root[data-theme="dark"] {
+  --surface-page:     #14181e;
+  --surface-default:  #1b212a;
+  --surface-shell:    #1b212a;
+  --surface-subtle:   #222932;
+  --surface-raised:   #222932;
+  --surface-hover:    #2a323d;
+  --surface-active:   #2a323d;
+  --surface-selected: var(--color-primary-800);
+  --surface-disabled: #2a323d;
+  --surface-overlay:  rgba(0, 0, 0, 0.6);
+
+  --text-primary:     #f2f4f7;
+  --text-secondary:   #b3bcc8;
+  --text-tertiary:    #8d97a5;
+  --text-placeholder: #8d97a5;
+  --text-brand:       var(--color-primary-200);
+  --text-nav:         #e3e8ef;
+
+  --border-default:   #333c48;
+  --border-divider:   #333c48;
+  --border-control:   #55606f;
+}
