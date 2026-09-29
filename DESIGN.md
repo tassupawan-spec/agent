@@ -79,10 +79,6 @@ styles/tokens.css
     ↓
 Authoritative token implementation
 
-shared/ui/
-    ↓
-Reusable UI components and primitives
-
 Ref/
     ↓
 Optional visual references used for validation and discovery
@@ -1494,10 +1490,6 @@ styles/tokens.css
     │
     │ authoritative token implementation
     ▼
-shared/ui/
-    │
-    │ reusable components
-    ▼
 Feature UI
 ```
 
@@ -1536,6 +1528,6 @@ A feature component must not become the source of truth for a Design System rule
 13. Formalized content and localization rules.
 14. Formalized token and component governance.
 15. Kept `styles/tokens.css` as the authoritative token implementation.
-16. Kept the Design System independent from `CLAUDE.md` and `AGENT.md`.
+16. Kept the Design System independent from `CLAUDE.md`.
 17. Removed feature-specific screen assumptions from the Design System.
 18. Kept the document reusable as the primary Design Context for the UI Designer Agent.

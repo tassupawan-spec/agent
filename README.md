@@ -1,11 +1,15 @@
-# CENTRAL GROUP SPRINT — TMS Design System
+# CENTRAL GROUP SPRINT — TMS Design System & Design Pipeline
 
-Design system and UI implementation guide for the **Central Group Sprint**
+Design system and AI-assisted design pipeline for the **Central Group Sprint**
 transportation & logistics management system (TMS).
 
-This repository is the single source of truth for how every TMS screen looks
-and behaves: design tokens, UI primitives, layout patterns, and the rules that
-keep 200 screens looking like one product.
+This repository holds two things:
+
+1. **The Design System** — design tokens, component contracts and the rules
+   that keep every TMS screen looking like one product.
+2. **The design pipeline** — three Claude Code agents that turn the owner's
+   source material (prototype, user journey, API reference) into a BRD, a UX
+   model and finally a hi-fi HTML Screen Flow.
 
 ---
 
@@ -13,11 +17,65 @@ keep 200 screens looking like one product.
 
 | File | What it is | Read it when |
 | --- | --- | --- |
-| **[DESIGN.md](./DESIGN.md)** | The token contract — every colour, size, spacing, radius and component token, calibrated against the production screen | Building or reviewing any UI |
-| **[CLAUDE.md](./CLAUDE.md)** | Operating rules for AI assistants — including §6, the design-generation contract for Claude Design mockups | Always loaded automatically by Claude Code / Cowork |
-| **[AGENT.md](./AGENT.md)** | Agent roles, task playbooks and handoff contracts | Delegating multi-step design or UI work to agents |
-| **[styles/tokens.css](./styles/tokens.css)** | The tokens themselves, as CSS custom properties | Wiring the tokens into the app |
-| **[Ref/](./Ref/)** | Production screenshots — the visual ground truth | Before assuming anything about how a screen looks |
+| **[DESIGN.md](./DESIGN.md)** | Design System contract — principles, tokens, component contracts, states, accessibility, governance | Building or reviewing any UI |
+| **[CLAUDE.md](./CLAUDE.md)** | Operating rules for AI agents — design rules, design-generation mode (§6), module boundaries (§7), pipeline (§8), status & blockers (§9) | Loaded automatically by Claude Code |
+| **[.claude/agents/](./.claude/agents/)** | The three pipeline agents: `ba-analyst`, `ux-designer`, `ui-designer` | Running or changing the pipeline |
+| **[styles/tokens.css](./styles/tokens.css)** | The tokens themselves, as CSS custom properties | Wiring tokens into a mockup or the app |
+| **[Ref/](./Ref/)** | Production screenshot used to calibrate DESIGN.md | Checking how the real product looks |
+
+---
+
+## Design pipeline
+
+```text
+projects/01-input-from-po/<Feature>/   Source from the owner (prototype, journey, HAR, API spec, PROC)
+        │
+        ▼  ba-analyst
+projects/02-ba-output/<Feature>/       BA_BRD.md — requirement, AC, API list / suggestion, To Do (SA · API · FE · QA)
+        │  [owner sets status: APPROVED]
+        ▼  ux-designer
+projects/03-ux-output/<Feature>/       Template & reuse mapping, screen-registry.json, UX model
+        │  [owner sets status: APPROVED]
+        ▼  ui-designer
+projects/04-ui-output/<Feature>/       ScreenFlow.html (final deliverable) + hi-fi .dc screens
+           [owner sets status: APPROVED]
+```
+
+- **One feature = one folder name in UpperCamelCase** (e.g. `SetupConfigTimeSlot`), identical in every stage.
+- Each agent writes **only** to its own stage folder ([CLAUDE.md §7](./CLAUDE.md)).
+- Every main output starts with a YAML frontmatter `status`. Agents set `IN_REVIEW`;
+  **only the owner sets `APPROVED`**. The next agent will not start until the
+  previous stage is `APPROVED` ([CLAUDE.md §9](./CLAUDE.md)).
+- When an agent hits a missing input or a high-impact ambiguity it stops and writes
+  `<Module>_Blockers.md` listing the options and **the data the owner must prepare**.
+- `_archive/` folders hold superseded outputs — agents do not use them.
+
+**Source folder layout** (`projects/01-input-from-po/`):
+
+```text
+<Feature>/
+├── prototype/     # Prototype HTML (mock data — contains no real API paths)
+├── journey/       # User journey / swimlane
+├── api_spec/      # Existing API spec or endpoint list
+├── har/           # Network export (sanitized HAR)
+├── proc_spec/     # PROC / SQL
+└── report/        # Example report outputs (xlsx)
+_shared/           # Screens and specs not tied to one feature — also used by UX as reuse templates
+```
+
+Only the sub-folders a feature actually needs are created.
+Case `REUSE` needs at least one of `api_spec/` or `har/`.
+
+**Running a stage** (Claude Code):
+
+```text
+@ba-analyst  feature: SetupConfigTimeSlot · case: REUSE
+@ux-designer feature: SetupConfigTimeSlot
+@ui-designer feature: SetupConfigTimeSlot
+```
+
+`case: REUSE` = an existing menu/screen is reused (BA lists the API paths in use);
+`case: NEW` = a new feature (BA suggests the APIs that should exist).
 
 ---
 
@@ -33,27 +91,25 @@ lines used only for table row dividers. Status is an inline coloured icon plus a
 plain Thai label — never a pill badge. No gradients, no glassmorphism, no
 oversized rounded cards, no decorative colour.
 
-> This is derived from `Ref/Screenshot 2026-08-25 114037.png`
-> (การจัดการงานขนส่ง). Values in DESIGN.md tagged **[measured]** came from that
-> file; anything tagged **[proposed]** is still unverified — see
-> [DESIGN.md §0](./DESIGN.md#0-reference).
+> Originally calibrated against `Ref/Screenshot 2026-08-25 114037.png`
+> (การจัดการงานขนส่ง). Token status (approved vs proposed) is listed in
+> DESIGN.md §3.5.
 
 ---
 
 ## Two ways this repo is used
 
-**Designing** — Claude Design canvases, HTML mockups and screen flows are
-generated from these documents. The token block from `styles/tokens.css` is
+**Designing** — the pipeline agents generate BRDs, UX models, HTML mockups and
+screen flows from these documents. The token block from `styles/tokens.css` is
 pasted inline into every mockup so a design and its implementation share the
-exact same values. Rules: [CLAUDE.md §6](./CLAUDE.md#6-design-generation-mode-claude-design--mockups).
-Roles and workflow: [AGENT.md §2.3 / §3.5](./AGENT.md).
+exact same values. Rules: [CLAUDE.md §6](./CLAUDE.md).
 
 **Implementing** — the same tokens are consumed by Angular components. A design
 that used tokens converts to code with no visual translation step.
 
 ---
 
-## Technical foundation
+## Technical foundation (target application)
 
 - **Angular 22**, standalone components only — no NgModules
 - **Angular Material** as the component base (`mat-form-field` outline,
@@ -75,81 +131,40 @@ that used tokens converts to code with no visual translation step.
 
 ```text
 .
-├── DESIGN.md
 ├── README.md
+├── DESIGN.md
 ├── CLAUDE.md
-├── AGENT.md
-│
-├── Ref/                    # production screenshots — visual ground truth
-│   └── Screenshot 2026-08-25 114037.png
-│
+├── .claude/agents/         # ba-analyst.md · ux-designer.md · ui-designer.md
+├── Ref/                    # production screenshot (calibration reference)
 ├── styles/
-│   ├── tokens.css          # design tokens — the single source of truth
-│   ├── reset.css           # normalisation
-│   ├── typography.css      # type role classes built from tokens
-│   └── globals.css         # app-level base styles, imports the above
-│
-└── src/
-    └── app/
-        ├── core/
-        │   ├── layout/     # app shell, sidebar, top bar, breadcrumb
-        │   └── services/   # http, auth, notification, config
-        │
-        ├── shared/
-        │   ├── ui/         # design system primitives
-        │   │   ├── button/
-        │   │   ├── input/
-        │   │   ├── select/
-        │   │   ├── date-picker/
-        │   │   ├── card/
-        │   │   ├── filter-bar/
-        │   │   ├── table/
-        │   │   ├── status/
-        │   │   ├── dialog/
-        │   │   ├── pagination/
-        │   │   └── empty-state/
-        │   └── models/     # shared types, enums, DTO contracts
-        │
-        └── features/       # one folder per business domain
-            ├── route-planning/     # ระบบจัดเส้นทาง
-            ├── transport-jobs/     # การจัดการงานขนส่ง
-            ├── shipments/          # รายการขนส่ง
-            ├── sales/              # การขาย
-            └── ...
+│   └── tokens.css          # design tokens — the single source of truth
+└── projects/
+    ├── 01-input-from-po/   # owner sources, one folder per feature (+ _shared/)
+    ├── 02-ba-output/       # ba-analyst
+    ├── 03-ux-output/       # ux-designer
+    └── 04-ui-output/       # ui-designer
 ```
 
-**Feature folder shape**
+The application code is not in this repository yet. When it is added, it follows
+this shape:
 
 ```text
-features/<domain>/
-├── pages/            # routed page components
-├── components/       # components used only by this domain
-├── services/         # domain data access
-├── models/           # domain types
-└── <domain>.routes.ts
+src/app/
+├── core/          # layout (shell, sidebar, top bar, breadcrumb), services
+├── shared/
+│   ├── ui/        # design system primitives (button, input, select, date-picker,
+│   │              #   card, filter-bar, table, status, dialog, pagination, empty-state)
+│   └── models/    # shared types, enums, DTO contracts
+└── features/<domain>/
+    ├── pages/ · components/ · services/ · models/
+    └── <domain>.routes.ts
 ```
 
 ---
 
-## Getting started
+## Using the tokens
 
-```bash
-npm install
-npm start          # dev server
-npm run build      # production build
-npm test           # unit tests
-npm run lint       # lint + style rules
-```
-
-Import the token layer once, at the top of `styles/globals.css`:
-
-```css
-@import "./tokens.css";
-@import "./reset.css";
-@import "./typography.css";
-```
-
-Then reference tokens in any component stylesheet:
+Reference tokens in any stylesheet or mockup:
 
 ```css
 .card {
@@ -191,21 +206,21 @@ Then reference tokens in any component stylesheet:
 9. **Every interactive element is keyboard reachable** and shows
    `--focus-ring` when focused.
 
-The full definition of done is in [DESIGN.md §11](./DESIGN.md#11-governance).
+The full definition of done is in DESIGN.md §21.
 
 ---
 
 ## Contributing a new UI primitive
 
-1. Check `Ref/` — does a production screen already show this pattern?
-2. Confirm no existing primitive covers the need.
-3. Define its token map first (see DESIGN.md §10) — reuse existing tokens.
-4. Build it as a standalone, OnPush component under `shared/ui/`.
-5. Cover every state: default, hover, focus, active, disabled, error, loading,
-   empty.
-6. Document variants, inputs/outputs and accessibility notes in a README beside
+1. Confirm no existing component contract in DESIGN.md §12 covers the need.
+2. Define its token map first — reuse existing tokens.
+3. Build it as a standalone, OnPush component under `shared/ui/`.
+4. Cover every state in DESIGN.md §13: default, hover, focus, active, disabled,
+   error, loading, empty.
+5. Document variants, inputs/outputs and accessibility notes in a README beside
    the component.
-7. Add the token map entry to DESIGN.md §10.
+6. Add the component contract to DESIGN.md §12 following the governance steps in
+   DESIGN.md §16.
 
 ---
 
@@ -213,6 +228,7 @@ The full definition of done is in [DESIGN.md §11](./DESIGN.md#11-governance).
 
 | Thing | Convention | Example |
 | --- | --- | --- |
+| Feature folder (pipeline) | UpperCamelCase, same in every stage | `SetupConfigTimeSlot` |
 | Component selector | `tms-` prefix, kebab-case | `tms-data-table` |
 | Component class | PascalCase + `Component` | `DataTableComponent` |
 | File | kebab-case | `data-table.component.ts` |
@@ -226,7 +242,4 @@ The full definition of done is in [DESIGN.md §11](./DESIGN.md#11-governance).
 
 ## Status
 
-**Version 1.1.0** — token contract calibrated against the production reference.
-Open questions (font family, success/info colours, dialog anatomy) are listed in
-[DESIGN.md §0](./DESIGN.md#0-reference).
-Change history: [DESIGN.md §12](./DESIGN.md#12-change-log).
+**DESIGN.md version 2.0.0** — Design System contract. Change history: DESIGN.md §23.
